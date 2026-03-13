@@ -4,7 +4,7 @@
 
 ---
 
-## 📦 O que está incluído neste projeto..
+## 📦 O que está incluído neste projeto...
 
 ```
 SalesChannel/
