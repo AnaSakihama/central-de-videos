@@ -1,4 +1,4 @@
-# SalesChannel — Vídeos Prontos para Afiliados Shopee
+# SalesChannel — Vídeos Prontos para Afiliados Shopee.
 
 > Canal privado no Telegram com vídeos prontos diários para afiliados Shopee | R$12,90 acesso vitalício
 
