@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SalesChannel Admin — Vídeos Shopee</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📹</div>
+      <div>
+        <div class="logo-title">SalesChannel</div>
+        <div class="logo-sub">Afiliados Shopee</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-view="dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-view="orders">
+        <span class="nav-icon">🛒</span> Pedidos
+      </a>
+      <a href="#" class="nav-item" data-view="pending">
+        <span class="nav-icon">⏳</span> Aguardando Aprovação
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="api-key-section">
+        <label>Admin Key</label>
+        <input type="password" id="adminKey" placeholder="Sua chave..." />
+        <button id="saveKey" onclick="saveKey()">Salvar</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-refresh" onclick="loadOrders()">
+          <span>🔄</span> Atualizar
+        </button>
+      </div>
+    </header>
+
+    <!-- Dashboard View -->
+    <section id="view-dashboard" class="view active">
+      <div class="stats-grid">
+        <div class="stat-card stat-total">
+          <div class="stat-icon">🧾</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-label">Total de Pedidos</div>
+          </div>
+        </div>
+        <div class="stat-card stat-approved">
+          <div class="stat-icon">✅</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statAprovados">—</div>
+            <div class="stat-label">Aprovados no Telegram</div>
+          </div>
+        </div>
+        <div class="stat-card stat-pending">
+          <div class="stat-icon">⌛</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statPendentes">—</div>
+            <div class="stat-label">Aguardando Aprovação</div>
+          </div>
+        </div>
+        <div class="stat-card stat-link">
+          <div class="stat-icon">📧</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statLinkEnviado">—</div>
+            <div class="stat-label">Link Enviado</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recent-section">
+        <div class="section-header">
+          <h2>Compras Recentes</h2>
+        </div>
+        <div id="recentTable">
+          <div class="loading-state"><div class="spinner"></div> Carregando...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders View -->
+    <section id="view-orders" class="view">
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Buscar por e-mail ou @username..." oninput="filterOrders()" />
+        </div>
+        <div class="filter-group">
+          <label>Status Pagamento</label>
+          <select id="filterPayment" onchange="filterOrders()">
+            <option value="">Todos</option>
+            <option value="aprovado">Aprovado</option>
+            <option value="pendente">Pendente</option>
+            <option value="recusado">Recusado</option>
+            <option value="estornado">Estornado</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Status Pedido</label>
+          <select id="filterOrder" onchange="filterOrders()">
+            <option value="">Todos</option>
+            <option value="novo">Novo</option>
+            <option value="link_enviado">Link Enviado</option>
+            <option value="aguardando_aprovacao">Aguardando Aprovação</option>
+            <option value="aprovado_no_telegram">Aprovado no Telegram</option>
+            <option value="rejeitado">Rejeitado</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="ordersTable">
+        <div class="loading-state"><div class="spinner"></div> Carregando...</div>
+      </div>
+    </section>
+
+    <!-- Pending View -->
+    <section id="view-pending" class="view">
+      <div class="info-banner">
+        <span>⚠️</span>
+        <p>Estes pedidos têm pagamento aprovado mas o comprador ainda não foi aprovado no canal. SLA: <strong>8 horas</strong>.</p>
+      </div>
+      <div id="pendingTable">
+        <div class="loading-state"><div class="spinner"></div> Carregando...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Order Detail Modal -->
+  <div id="modal" class="modal-overlay" onclick="closeModalOutside(event)">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
