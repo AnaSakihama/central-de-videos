@@ -1,10 +1,10 @@
 -- =============================================================
--- SalesChannel — Script de inicialização do banco PostgreSQL
--- Banco: shopee_db | Host: db | Porta: 5432 | User: shopee_user
+-- sellingvideos — Script de inicialização do banco PostgreSQL
+-- Banco: sellingvideos_db | Host: saleschannel_postgres | Porta: 5432 | Owner: core
 -- =============================================================
 
--- 1. Criar schema dedicado ao projeto SalesChannel
-CREATE SCHEMA IF NOT EXISTS saleschannel;
+-- 1. Criar schema dedicado ao projeto sellingvideos
+CREATE SCHEMA IF NOT EXISTS saleschannel AUTHORIZATION core;
 
 -- 2. Criar tabela de pedidos
 CREATE TABLE IF NOT EXISTS saleschannel.pedidos (
@@ -20,7 +20,10 @@ CREATE TABLE IF NOT EXISTS saleschannel.pedidos (
   log_email         TEXT
 );
 
--- 3. Índices úteis para filtros do painel admin
+-- 3. Definir owner da tabela
+ALTER TABLE saleschannel.pedidos OWNER TO core;
+
+-- 4. Índices úteis para filtros do painel admin
 CREATE INDEX IF NOT EXISTS idx_pedidos_status_pedido    ON saleschannel.pedidos (status_pedido);
 CREATE INDEX IF NOT EXISTS idx_pedidos_status_pagamento ON saleschannel.pedidos (status_pagamento);
 CREATE INDEX IF NOT EXISTS idx_pedidos_criado_em        ON saleschannel.pedidos (criado_em DESC);

@@ -24,22 +24,21 @@ https://saleschannel.com.br/sellingvideos  ← Cloudflare Origin Cert → NPM �
 |-----------|-------|
 | Container/Host | `saleschannel_postgres` |
 | Porta | `5432` |
-| User | *(valor de `POSTGRES_USER` no `.env` atual da VPS)* |
-| Password | *(valor de `POSTGRES_PASSWORD` no `.env` atual da VPS)* |
+| Database | `sellingvideos_db` |
+| User/Owner | `core` |
 
 > [!CAUTION]
 > Use sempre as credenciais que já estão no `.env` da VPS. Não sobrescreva o arquivo — o banco foi inicializado com esses valores.
 
 **Verificar tabela migrada:**
 ```bash
-docker exec -it saleschannel_postgres psql -U <POSTGRES_USER> -c "\l"
-docker exec -it saleschannel_postgres psql -U <POSTGRES_USER> -d <nome_banco> \
+docker exec -it saleschannel_postgres psql -U core -d sellingvideos_db \
   -c "SELECT COUNT(*) FROM saleschannel.pedidos;"
 ```
 
 **Se precisar criar do zero:**
 ```bash
-docker exec -i saleschannel_postgres psql -U <POSTGRES_USER> -d <nome_banco> \
+docker exec -i saleschannel_postgres psql -U core -d sellingvideos_db \
   < /root/apps/saleschannel/products/sellingvideos/n8n-workflows/init-saleschannel.sql
 ```
 
@@ -47,14 +46,14 @@ docker exec -i saleschannel_postgres psql -U <POSTGRES_USER> -d <nome_banco> \
 
 ## 2. Credenciais no n8n
 
-### PostgreSQL
+### 4.1 Credencial PostgreSQL
 | Campo | Valor |
 |---|---|
 | **Name** | `PostgreSQL - SalesChannel` |
 | **Host** | `saleschannel_postgres` |
-| **Database** | `shopee_db` |
-| **User** | `shopee_user` |
-| **Password** | `<conforme .env>` |
+| **Database** | `sellingvideos_db` |
+| **User** | `core` |
+| **Password** | *(senha do user `core` na VPS)* |
 | **Port** | `5432` |
 
 > O nome da credential deve ser exatamente `PostgreSQL - SalesChannel`.
