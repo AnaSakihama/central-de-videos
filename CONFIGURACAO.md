@@ -1,137 +1,142 @@
-# Configuração do Banco de Dados — SalesChannel
+# Configuração — sellingvideos (ex-SalesChannel)
 
-> **Atualizado em:** Março 2026 — controle de pedidos migrado de Google Sheets para **PostgreSQL**.
+> **Atualizado em:** Abril 2026 — migrado para nova VPS `187.127.3.62` com Cloudflare Tunnel.
 
 ---
 
-## 1. Pré-requisito: banco de dados PostgreSQL
+## Arquitetura
 
-O projeto utiliza o banco `shopee_db`, que já deve estar em execução no ambiente (container Docker ou servidor). Dados de conexão:
+```
+Mercado Pago (webhook)
+        ↓
+https://n8n.saleschannel.com.br   ← Cloudflare Tunnel → saleschannel_n8n:5678
+        ↓
+saleschannel_postgres (PostgreSQL)
+        ↓
+https://saleschannel.com.br/sellingvideos  ← NPM → saleschannel_portal → admin-panel/
+```
+
+---
+
+## 1. Banco de Dados PostgreSQL
 
 | Parâmetro | Valor |
 |-----------|-------|
-| Host | `db` |
+| Container/Host | `saleschannel_postgres` |
 | Porta | `5432` |
-| Database | `shopee_db` |
+| Database | `shopee_db` *(confirmar após migração)* |
 | User | `shopee_user` |
 
----
-
-## 2. Criar o Schema e a Tabela
-
-Execute o script `n8n-workflows/init-saleschannel.sql` no banco:
-
-```bash
-psql -h db -U shopee_user -d shopee_db -f n8n-workflows/init-saleschannel.sql
+**Verificar tabela migrada:**
+```sql
+SELECT COUNT(*) FROM saleschannel.pedidos;
 ```
 
-Ou copie e cole o conteúdo em qualquer client (pgAdmin, DBeaver, etc.).
-
-O script cria:
-- **Schema:** `saleschannel`
-- **Tabela:** `saleschannel.pedidos`
-- **Índices** para filtros frequentes (`status_pedido`, `status_pagamento`, `criado_em`, `email`)
-
-### Estrutura da Tabela
-
-| Coluna | Tipo | Descrição |
-|---|---|---|
-| `order_id` | `TEXT` (PK) | ID do pagamento Mercado Pago |
-| `nome` | `TEXT` | Nome do comprador |
-| `email` | `TEXT` | E-mail do comprador |
-| `telegram_username` | `TEXT` | @username do Telegram |
-| `valor` | `NUMERIC(10,2)` | Valor pago (ex: `12.90`) |
-| `status_pagamento` | `TEXT` | `aprovado` \| `recusado` \| `estornado` |
-| `status_pedido` | `TEXT` | `novo` \| `link_enviado` \| `rejeitado` |
-| `criado_em` | `TIMESTAMPTZ` | Data/hora da criação |
-| `aprovado_em` | `TIMESTAMPTZ` | Data/hora da aprovação manual |
-| `log_email` | `TEXT` | Log do envio de e-mail |
+**Se precisar criar do zero:**
+```bash
+docker exec -i saleschannel_postgres psql -U shopee_user -d shopee_db \
+  < /root/apps/saleschannel/products/sellingvideos/n8n-workflows/init-saleschannel.sql
+```
 
 ---
 
-## 3. Criar a Credential PostgreSQL no n8n
+## 2. Credenciais no n8n
 
-1. No n8n: **Settings → Credentials → New Credential**
-2. Tipo: **PostgreSQL**
-3. Preencha:
-
+### PostgreSQL
 | Campo | Valor |
 |---|---|
 | **Name** | `PostgreSQL - SalesChannel` |
-| **Host** | `db` |
+| **Host** | `saleschannel_postgres` |
 | **Database** | `shopee_db` |
 | **User** | `shopee_user` |
-| **Password** | `<sua senha>` |
+| **Password** | `<conforme .env>` |
 | **Port** | `5432` |
 
-4. Clique em **Save**
-
-> **Importante:** O nome da credential deve ser exatamente `PostgreSQL - SalesChannel`, pois os workflows referenciam esse nome.
-
----
-
-## 4. Configurar Credenciais Restantes no n8n
+> O nome da credential deve ser exatamente `PostgreSQL - SalesChannel`.
 
 ### Mercado Pago (HTTP Header Auth)
+| Campo | Valor |
+|---|---|
+| **Name** | `Mercado Pago - Access Token` |
+| **Header Name** | `Authorization` |
+| **Header Value** | `Bearer SEU_ACCESS_TOKEN_DE_PRODUCAO` |
 
-1. Tipo: `HTTP Header Auth`
-2. Nome: `Mercado Pago - Access Token`
-3. Header Name: `Authorization`
-4. Header Value: `Bearer SEU_ACCESS_TOKEN_DE_PRODUCAO`
-   - Obtenha em: [developers.mercadopago.com](https://developers.mercadopago.com)
+Obtenha em: [developers.mercadopago.com](https://developers.mercadopago.com)
 
 ### Gmail SMTP
+| Campo | Valor |
+|---|---|
+| **Name** | `Gmail SMTP - SalesChannel` |
+| **Host** | `smtp.gmail.com` |
+| **Port** | `465` (SSL) |
+| **User** | seu e-mail Gmail |
+| **Password** | Senha de App do Google |
 
-1. Tipo: `SMTP`
-2. Nome: `Gmail SMTP - SalesChannel`
-3. Host: `smtp.gmail.com`
-4. Port: `465` (SSL) ou `587` (TLS)
-5. User: seu e-mail Gmail
-6. Password: **Senha de App do Google** (NÃO sua senha normal)
-   - Gere em: myaccount.google.com → Segurança → Senhas de app
-
----
-
-## 5. Importar Workflows no n8n
-
-1. No n8n: **Workflows → Novo → Importar do arquivo**
-2. Importe `WF1-pagamento-aprovado.json`
-3. Importe `WF3-admin-api.json`
-4. Em cada workflow, abra os nós **PostgreSQL** e confirme que a credential `PostgreSQL - SalesChannel` está selecionada
-5. Configure os e-mails (de/para) nos nós `emailSend`
-6. No WF3, substitua `DEFINA_SUA_ADMIN_KEY_AQUI` por uma chave forte (ex: `sc_admin_2026_XXXXX`)
-7. Ative os dois workflows
+Gere em: myaccount.google.com → Segurança → Senhas de app
 
 ---
 
-## 6. Configurar Webhook no Mercado Pago
+## 3. Importar Workflows no n8n
+
+1. Acesse `https://n8n.saleschannel.com.br`
+2. **Workflows → Importar do arquivo**
+3. Importe `WF1-pagamento-aprovado.json`
+4. Importe `WF3-admin-api.json`
+5. Em cada workflow: abra os nós **PostgreSQL** → confirme a credential
+6. No WF3: substitua `DEFINA_SUA_ADMIN_KEY_AQUI` por uma chave forte
+7. **Ative os dois workflows**
+
+---
+
+## 4. Webhook Mercado Pago
 
 1. Acesse [developers.mercadopago.com](https://developers.mercadopago.com)
 2. Sua Aplicação → **Configurar notificações**
-3. URL de notificação: `https://SEU_N8N_URL/webhook/mp-payment`
-4. Marque o evento: ✅ **Pagamentos**
-5. Salve
+3. URL: `https://n8n.saleschannel.com.br/webhook/mp-payment`
+4. Evento: ✅ **Pagamentos**
 
 ---
 
-## 7. Configurar Admin Panel
+## 5. Nginx Proxy Manager (NPM)
 
-Abra `admin-panel/app.js` e edite:
-```javascript
-const API_BASE = 'https://SEU_N8N_URL/webhook/admin'; // Sua URL n8n real
-```
+Acesse o NPM em `http://187.127.3.62:81` e configure:
 
-O painel lê os pedidos da API n8n, que por sua vez consulta a tabela `saleschannel.pedidos` no PostgreSQL.
+| Host | Destino interno | SSL |
+|---|---|---|
+| `saleschannel.com.br` | `http://saleschannel_portal:80` | Let's Encrypt |
+| `n8n.saleschannel.com.br` | via Cloudflare Tunnel | — |
+| `evolution.saleschannel.com.br` | via Cloudflare Tunnel | — |
+
+> O path `/sellingvideos` é servido automaticamente pelo `saleschannel_portal` que monta `/root/apps/saleschannel/products`.
 
 ---
 
-## 8. Testar o Fluxo Completo
+## 6. Cloudflare Tunnels
+
+| Tunnel | Domínio | Serviço interno |
+|---|---|---|
+| `Tunnel-n8n-saleschannel-prod` | `n8n.saleschannel.com.br` | `http://saleschannel_n8n:5678` |
+| `Tunnel-evolution-saleschannel-prod` | `evolution.saleschannel.com.br` | `http://saleschannel_evolution:8080` |
+
+---
+
+## 7. Admin Panel
+
+URL de acesso: **`https://saleschannel.com.br/sellingvideos`**
+
+- Arquivos estáticos servidos pelo `saleschannel_portal`
+- Comunicação com n8n via `https://n8n.saleschannel.com.br/webhook/admin`
+- A **Admin Key** do WF3 é necessária para autenticar as requisições
+
+---
+
+## 8. Teste do Fluxo Completo
 
 1. Use o **Sandbox do Mercado Pago** para fazer um pagamento de teste
-2. Verifique se o webhook chegou no n8n (aba **Executions**)
-3. Confirme o registro inserido no banco:
+2. Verifique o webhook no n8n: aba **Executions**
+3. Confirme o registro no banco:
    ```sql
    SELECT * FROM saleschannel.pedidos ORDER BY criado_em DESC LIMIT 5;
    ```
-4. Verifique o e-mail de confirmação na caixa do comprador de teste
-5. Abra o painel admin e confirme que o pedido aparece
+4. Verifique o e-mail de confirmação
+5. Acesse `https://saleschannel.com.br/sellingvideos` e confirme o pedido no painel

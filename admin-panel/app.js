@@ -3,7 +3,7 @@
 //  Conecta com a API n8n (WF3 - Admin API)
 // ─────────────────────────────────────────────
 
-const API_BASE = 'http://76.13.81.21:15678/webhook/admin'; // Endpoint único do WF3
+const API_BASE = 'https://n8n.saleschannel.com.br/webhook/admin'; // Endpoint único do WF3
 let adminKey = localStorage.getItem('sc_admin_key') || '';
 let allOrders = [];
 
