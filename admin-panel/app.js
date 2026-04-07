@@ -3,7 +3,7 @@
 //  Conecta com a API n8n (WF3 - Admin API)
 // ─────────────────────────────────────────────
 
-const API_BASE = 'http://localhost:5678/webhook/admin'; // Ajustar para URL n8n em produção
+const API_BASE = 'http://76.13.81.21:15678/webhook/admin'; // Endpoint único do WF3
 let adminKey = localStorage.getItem('sc_admin_key') || '';
 let allOrders = [];
 
@@ -59,7 +59,12 @@ async function loadOrders() {
     setTableLoading('ordersTable');
     setTableLoading('pendingTable');
 
-    const res = await fetch(`${API_BASE}/orders`, { headers: getHeaders() });
+    // WF3 usa um único endpoint POST com campo action no body
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ action: 'listar_pedidos' })
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     allOrders = Array.isArray(data) ? data : (data.orders || []);
@@ -78,10 +83,12 @@ async function loadOrders() {
 // ── Stats ─────────────────────────────────────
 function updateStats() {
   document.getElementById('statTotal').textContent = allOrders.length;
+  // Valores de status_pedido conforme tabela saleschannel.pedidos:
+  // 'novo' | 'link_enviado' | 'rejeitado'
   document.getElementById('statAprovados').textContent =
-    allOrders.filter(o => o.status_pedido === 'aprovado_no_telegram').length;
+    allOrders.filter(o => o.status_pagamento === 'aprovado').length;
   document.getElementById('statPendentes').textContent =
-    allOrders.filter(o => o.status_pedido === 'aguardando_aprovacao').length;
+    allOrders.filter(o => o.status_pedido === 'novo').length;
   document.getElementById('statLinkEnviado').textContent =
     allOrders.filter(o => o.status_pedido === 'link_enviado').length;
 }
@@ -89,22 +96,21 @@ function updateStats() {
 // ── Render Helpers ────────────────────────────
 function paymentBadge(status) {
   const map = {
-    aprovado:  ['badge-green',  '✅', 'Aprovado'],
-    pendente:  ['badge-yellow', '⏳', 'Pendente'],
-    recusado:  ['badge-red',    '❌', 'Recusado'],
-    estornado: ['badge-red',    '↩️', 'Estornado'],
+    aprovado: ['badge-green', '✅', 'Aprovado'],
+    pendente: ['badge-yellow', '⏳', 'Pendente'],
+    recusado: ['badge-red', '❌', 'Recusado'],
+    estornado: ['badge-red', '↩️', 'Estornado'],
   };
   const [cls, icon, label] = map[status] || ['badge-gray', '❓', status || '—'];
   return `<span class="badge ${cls}">${icon} ${label}</span>`;
 }
 
 function orderBadge(status) {
+  // Valores conforme tabela saleschannel.pedidos
   const map = {
-    novo:                 ['badge-gray',   '🆕', 'Novo'],
-    link_enviado:         ['badge-blue',   '📧', 'Link Enviado'],
-    aguardando_aprovacao: ['badge-yellow', '⌛', 'Aguardando'],
-    aprovado_no_telegram: ['badge-green',  '✅', 'Aprovado'],
-    rejeitado:            ['badge-red',    '🚫', 'Rejeitado'],
+    novo:         ['badge-gray',   '🆕', 'Novo'],
+    link_enviado: ['badge-blue',   '📧', 'Link Enviado'],
+    rejeitado:    ['badge-red',    '🚫', 'Rejeitado'],
   };
   const [cls, icon, label] = map[status] || ['badge-gray', '❓', status || '—'];
   return `<span class="badge ${cls}">${icon} ${label}</span>`;
@@ -148,8 +154,9 @@ function filterOrders() {
 }
 
 function renderPendingTable() {
+  // Pedidos que ainda precisam de ação: novos e com link enviado
   const pending = allOrders.filter(o =>
-    o.status_pedido === 'aguardando_aprovacao' || o.status_pedido === 'link_enviado'
+    o.status_pedido === 'novo' || o.status_pedido === 'link_enviado'
   );
   document.getElementById('pendingTable').innerHTML = buildTable(pending);
 }
@@ -164,7 +171,7 @@ function buildTable(orders) {
       <td>${o.order_id || '—'}</td>
       <td>${o.nome || '—'}</td>
       <td>${o.email || '—'}</td>
-      <td>${o.telegram_username ? '@' + o.telegram_username.replace('@','') : '—'}</td>
+      <td>${o.telegram_username ? '@' + o.telegram_username.replace('@', '') : '—'}</td>
       <td>${paymentBadge(o.status_pagamento)}</td>
       <td>${orderBadge(o.status_pedido)}</td>
       <td>${formatDate(o.criado_em)}</td>
@@ -194,7 +201,7 @@ function openOrderModal(orderId) {
     ? `<div class="eligibility-ok">✅ Pagamento aprovado — elegível para entrada no canal.</div>`
     : `<div class="eligibility-fail">❌ Pagamento NÃO aprovado — não autorizar entrada.</div>`;
 
-  const canApprove = eligible && order.status_pedido !== 'aprovado_no_telegram' && order.status_pedido !== 'rejeitado';
+  const canApprove = eligible && order.status_pedido !== 'rejeitado';
 
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-title">📋 Pedido #${order.order_id}</div>
@@ -202,7 +209,7 @@ function openOrderModal(orderId) {
     <div style="margin-top:16px">
       ${detailRow('Nome', order.nome || '—')}
       ${detailRow('E-mail', order.email || '—')}
-      ${detailRow('Telegram', order.telegram_username ? '@'+order.telegram_username : '—')}
+      ${detailRow('Telegram', order.telegram_username ? '@' + order.telegram_username : '—')}
       ${detailRow('Valor', 'R$' + (order.valor || '12,90'))}
       ${detailRow('Status Pagamento', paymentBadge(order.status_pagamento))}
       ${detailRow('Status Pedido', orderBadge(order.status_pedido))}
@@ -212,8 +219,8 @@ function openOrderModal(orderId) {
     </div>
     <div class="modal-actions">
       ${canApprove ? `
-        <button class="btn btn-success" onclick="updateStatus('${order.order_id}','aprovado_no_telegram')">
-          ✅ Aprovado no Telegram
+        <button class="btn btn-success" onclick="updateStatus('${order.order_id}','link_enviado')">
+          📧 Marcar Link Enviado
         </button>
         <button class="btn btn-danger" onclick="updateStatus('${order.order_id}','rejeitado')">
           🚫 Rejeitar
@@ -246,10 +253,16 @@ function closeModalOutside(e) {
 // ── Update Status ─────────────────────────────
 async function updateStatus(orderId, newStatus) {
   try {
-    const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+    // WF3 usa um único endpoint POST com action: atualizar_status
+    const res = await fetch(API_BASE, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({ status_pedido: newStatus, aprovado_em: new Date().toISOString() })
+      body: JSON.stringify({
+        action: 'atualizar_status',
+        order_id: orderId,
+        status_pedido: newStatus,
+        aprovado_em: newStatus === 'link_enviado' ? new Date().toISOString() : ''
+      })
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     closeModal();

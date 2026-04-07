@@ -6,16 +6,13 @@
       "name": "Receber IPN Mercado Pago",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [
-        250,
-        300
-      ],
+      "position": [250, 300],
       "webhookId": "mp-payment-webhook",
       "parameters": {
         "httpMethod": "POST",
         "path": "mp-payment",
         "responseMode": "onReceived",
-        "responseData": ""
+        "responseData": "allEntries"
       }
     },
     {
@@ -23,10 +20,7 @@
       "name": "Consultar Pagamento MP",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [
-        470,
-        300
-      ],
+      "position": [470, 300],
       "parameters": {
         "method": "GET",
         "url": "=https://api.mercadopago.com/v1/payments/{{ $json.data.id }}",
@@ -54,10 +48,7 @@
       "name": "Pagamento Aprovado?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [
-        690,
-        300
-      ],
+      "position": [690, 300],
       "parameters": {
         "conditions": {
           "options": {
@@ -85,60 +76,26 @@
       "name": "Montar Objeto do Pedido",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        910,
-        200
-      ],
+      "position": [910, 200],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const payment = $input.first().json;\nconst meta = payment.metadata || {};\nconst payer = payment.payer || {};\n\nconst nome = payer.first_name\n  ? `${payer.first_name} ${payer.last_name || ''}`.trim()\n  : (meta.nome || 'Afiliado');\n\nreturn [{\n  json: {\n    order_id: payment.id?.toString() || String(Date.now()),\n    nome: nome,\n    email: payer.email || meta.email || '',\n    telegram_username: meta.telegram_username || '',\n    valor: payment.transaction_amount?.toFixed(2) || '12.90',\n    status_pagamento: 'aprovado',\n    status_pedido: 'novo',\n    criado_em: new Date().toISOString(),\n    aprovado_em: '',\n    log_email: ''\n  }\n}];"
+        "jsCode": "const payment = $input.first().json;\nconst meta = payment.metadata || {};\nconst payer = payment.payer || {};\n\nconst nome = payer.first_name\n  ? `${payer.first_name} ${payer.last_name || ''}`.trim()\n  : (meta.nome || 'Afiliado');\n\nreturn [{\n  json: {\n    order_id: payment.id?.toString() || String(Date.now()),\n    nome: nome,\n    email: payer.email || meta.email || '',\n    telegram_username: meta.telegram_username || '',\n    valor: payment.transaction_amount?.toFixed(2) || '12.90',\n    status_pagamento: 'aprovado',\n    status_pedido: 'novo',\n    criado_em: new Date().toISOString(),\n    aprovado_em: null,\n    log_email: ''\n  }\n}];"
       }
     },
     {
-      "id": "node-sheets-insert",
-      "name": "Gravar Pedido no Sheets",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4,
-      "position": [
-        1130,
-        200
-      ],
+      "id": "node-pg-insert",
+      "name": "Gravar Pedido no PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1130, 200],
       "parameters": {
-        "operation": "appendOrUpdate",
-        "documentId": {
-          "__rl": true,
-          "value": "1Llgir5nwJ1Kllgx_RKBS2XUbi6qohNWsb4N6Gan-7nE",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "pedidos",
-          "mode": "name"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "order_id": "={{ $json.order_id }}",
-            "nome": "={{ $json.nome }}",
-            "email": "={{ $json.email }}",
-            "telegram_username": "={{ $json.telegram_username }}",
-            "valor": "={{ $json.valor }}",
-            "status_pagamento": "={{ $json.status_pagamento }}",
-            "status_pedido": "={{ $json.status_pedido }}",
-            "criado_em": "={{ $json.criado_em }}",
-            "aprovado_em": "={{ $json.aprovado_em }}",
-            "log_email": "={{ $json.log_email }}"
-          },
-          "matchingColumns": [
-            "order_id"
-          ],
-          "schema": []
-        }
+        "operation": "executeQuery",
+        "query": "INSERT INTO saleschannel.pedidos\n  (order_id, nome, email, telegram_username, valor, status_pagamento, status_pedido, criado_em, aprovado_em, log_email)\nVALUES\n  ('{{ $json.order_id }}', '{{ $json.nome }}', '{{ $json.email }}', '{{ $json.telegram_username }}', {{ $json.valor }}, '{{ $json.status_pagamento }}', '{{ $json.status_pedido }}', '{{ $json.criado_em }}', NULL, '')\nON CONFLICT (order_id) DO UPDATE SET\n  status_pagamento = EXCLUDED.status_pagamento,\n  status_pedido    = EXCLUDED.status_pedido,\n  criado_em        = EXCLUDED.criado_em;"
       },
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "2",
-          "name": "Google Sheets - SalesChannel"
+        "postgres": {
+          "id": "10",
+          "name": "PostgreSQL - SalesChannel"
         }
       }
     },
@@ -147,10 +104,7 @@
       "name": "Email Comprador - Confirmação",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [
-        1350,
-        200
-      ],
+      "position": [1350, 200],
       "parameters": {
         "fromEmail": "COLE_SEU_EMAIL_AQUI@gmail.com",
         "toEmail": "={{ $('Montar Objeto do Pedido').item.json.email }}",
@@ -171,10 +125,7 @@
       "name": "Email Admin - Nova Compra",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [
-        1570,
-        200
-      ],
+      "position": [1570, 200],
       "parameters": {
         "fromEmail": "COLE_SEU_EMAIL_AQUI@gmail.com",
         "toEmail": "COLE_SEU_EMAIL_ADMIN_AQUI@gmail.com",
@@ -191,43 +142,19 @@
       }
     },
     {
-      "id": "node-sheets-update-link",
+      "id": "node-pg-update-link",
       "name": "Atualizar Status - Link Enviado",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4,
-      "position": [
-        1790,
-        200
-      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1790, 200],
       "parameters": {
-        "operation": "update",
-        "documentId": {
-          "__rl": true,
-          "value": "1Llgir5nwJ1Kllgx_RKBS2XUbi6qohNWsb4N6Gan-7nE",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "pedidos",
-          "mode": "name"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "order_id": "={{ $('Montar Objeto do Pedido').item.json.order_id }}",
-            "status_pedido": "link_enviado",
-            "log_email": "=enviado em {{ new Date().toISOString() }}"
-          },
-          "matchingColumns": [
-            "order_id"
-          ],
-          "schema": []
-        }
+        "operation": "executeQuery",
+        "query": "UPDATE saleschannel.pedidos\nSET\n  status_pedido = 'link_enviado',\n  log_email     = 'enviado em ' || NOW()::TEXT\nWHERE order_id = '{{ $('Montar Objeto do Pedido').item.json.order_id }}';"
       },
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "2",
-          "name": "Google Sheets - SalesChannel"
+        "postgres": {
+          "id": "10",
+          "name": "PostgreSQL - SalesChannel"
         }
       }
     },
@@ -236,152 +163,57 @@
       "name": "Tratar Status Recusado",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        910,
-        420
-      ],
+      "position": [910, 420],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const payment = $input.first().json;\nconst statusMap = {\n  rejected: 'recusado',\n  cancelled: 'recusado',\n  refunded: 'estornado',\n  charged_back: 'estornado'\n};\nconst payer = payment.payer || {};\n\nreturn [{\n  json: {\n    order_id: payment.id?.toString() || '',\n    email: payer.email || '',\n    status_pagamento: statusMap[payment.status] || payment.status,\n    status_pedido: 'rejeitado'\n  }\n}];"
       }
     },
     {
-      "id": "node-sheets-update-rejected",
+      "id": "node-pg-update-rejected",
       "name": "Atualizar Status - Recusado",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4,
-      "position": [
-        1130,
-        420
-      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1130, 420],
       "parameters": {
-        "operation": "appendOrUpdate",
-        "documentId": {
-          "__rl": true,
-          "value": "1Llgir5nwJ1Kllgx_RKBS2XUbi6qohNWsb4N6Gan-7nE",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "pedidos",
-          "mode": "name"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "order_id": "={{ $json.order_id }}",
-            "status_pagamento": "={{ $json.status_pagamento }}",
-            "status_pedido": "={{ $json.status_pedido }}"
-          },
-          "matchingColumns": [
-            "order_id"
-          ],
-          "schema": []
-        }
+        "operation": "executeQuery",
+        "query": "INSERT INTO saleschannel.pedidos\n  (order_id, email, status_pagamento, status_pedido, criado_em)\nVALUES\n  ('{{ $json.order_id }}', '{{ $json.email }}', '{{ $json.status_pagamento }}', '{{ $json.status_pedido }}', NOW())\nON CONFLICT (order_id) DO UPDATE SET\n  status_pagamento = EXCLUDED.status_pagamento,\n  status_pedido    = EXCLUDED.status_pedido;"
       },
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "2",
-          "name": "Google Sheets - SalesChannel"
+        "postgres": {
+          "id": "10",
+          "name": "PostgreSQL - SalesChannel"
         }
       }
     }
   ],
   "connections": {
     "Receber IPN Mercado Pago": {
-      "main": [
-        [
-          {
-            "node": "Consultar Pagamento MP",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Consultar Pagamento MP", "type": "main", "index": 0}]]
     },
     "Consultar Pagamento MP": {
-      "main": [
-        [
-          {
-            "node": "Pagamento Aprovado?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Pagamento Aprovado?", "type": "main", "index": 0}]]
     },
     "Pagamento Aprovado?": {
       "main": [
-        [
-          {
-            "node": "Montar Objeto do Pedido",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Tratar Status Recusado",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{"node": "Montar Objeto do Pedido", "type": "main", "index": 0}],
+        [{"node": "Tratar Status Recusado", "type": "main", "index": 0}]
       ]
     },
     "Montar Objeto do Pedido": {
-      "main": [
-        [
-          {
-            "node": "Gravar Pedido no Sheets",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Gravar Pedido no PostgreSQL", "type": "main", "index": 0}]]
     },
-    "Gravar Pedido no Sheets": {
-      "main": [
-        [
-          {
-            "node": "Email Comprador - Confirmação",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Gravar Pedido no PostgreSQL": {
+      "main": [[{"node": "Email Comprador - Confirmação", "type": "main", "index": 0}]]
     },
     "Email Comprador - Confirmação": {
-      "main": [
-        [
-          {
-            "node": "Email Admin - Nova Compra",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Email Admin - Nova Compra", "type": "main", "index": 0}]]
     },
     "Email Admin - Nova Compra": {
-      "main": [
-        [
-          {
-            "node": "Atualizar Status - Link Enviado",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Atualizar Status - Link Enviado", "type": "main", "index": 0}]]
     },
     "Tratar Status Recusado": {
-      "main": [
-        [
-          {
-            "node": "Atualizar Status - Recusado",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Atualizar Status - Recusado", "type": "main", "index": 0}]]
     }
   },
   "settings": {
@@ -391,7 +223,5 @@
   "meta": {
     "templateCredsSetupCompleted": false
   },
-  "tags": [
-    "SalesChannel"
-  ]
+  "tags": ["SalesChannel"]
 }

@@ -24,15 +24,18 @@ SalesChannel/
 
 ## 🚀 Configuração Inicial
 
-### 1. Google Sheets (Banco de Dados)
+### 1. PostgreSQL — Banco de Dados
 
-Crie uma planilha chamada `SalesChannel - Pedidos` com a aba `pedidos`:
+O projeto usa o schema **`saleschannel`** no banco `shopee_db`. Execute o script de inicialização:
 
-| order_id | nome | email | telegram_username | valor | status_pagamento | status_pedido | criado_em | aprovado_em | log_email |
-|---|---|---|---|---|---|---|---|---|---|
+```bash
+psql -h db -U shopee_user -d shopee_db -f n8n-workflows/init-saleschannel.sql
+```
 
-Valores de `status_pagamento`: `pendente`, `aprovado`, `recusado`, `estornado`  
-Valores de `status_pedido`: `novo`, `link_enviado`, `aguardando_aprovacao`, `aprovado_no_telegram`, `rejeitado`
+Isso cria o schema, a tabela `saleschannel.pedidos` e os índices necessários. Veja `CONFIGURACAO.md` para detalhes completos.
+
+Valores de `status_pagamento`: `aprovado`, `recusado`, `estornado`  
+Valores de `status_pedido`: `novo`, `link_enviado`, `rejeitado`
 
 ### 2. n8n — Credenciais Necessárias
 
@@ -83,58 +86,22 @@ No n8n, vá em **Settings → Credentials → Add Credential** para cada item ab
 
 ---
 
-#### 📊 2.3 — Google Sheets OAuth2
+#### 🗄️ 2.3 — PostgreSQL
 
-**Tipo no n8n:** `Google Sheets OAuth2 API`
+**Tipo no n8n:** `PostgreSQL`
 
-> ⚠️ Para uso próprio (sem publicação pública), o fluxo simplificado abaixo é suficiente.
+1. No n8n: **Settings → Credentials → New Credential**
+2. Tipo: **PostgreSQL**
+3. Preencha:
+   - **Name:** `PostgreSQL - SalesChannel`
+   - **Host:** `db`
+   - **Database:** `shopee_db`
+   - **User:** `shopee_user`
+   - **Password:** `<sua senha>`
+   - **Port:** `5432`
+4. Clique em **Save**
 
-1. Acesse [console.cloud.google.com](https://console.cloud.google.com)
-2. Crie um projeto (ou selecione um existente)
-3. Vá em **APIs e serviços → Biblioteca** → busque `Google Sheets API` → **Ativar**
-4. Vá em **APIs e serviços → Credenciais → Criar credenciais → ID do cliente OAuth**
-   - **Tipo de aplicação:** `Aplicativo da Web`
-   - **Nome:** `n8n SalesChannel`
-   - Em **URIs de redirecionamento autorizados**, adicione a URL de callback do seu n8n:  
-     `http://localhost:5678/rest/oauth2-credential/callback` (local)  
-     ou `https://SEU_N8N/rest/oauth2-credential/callback` (produção)
-5. Copie o **Client ID** e o **Client Secret**
-6. No n8n, crie uma credencial do tipo **Google Sheets OAuth2 API**:
-   - **Name:** `Google Sheets OAuth`
-   - **Client ID:** cole o valor copiado
-   - **Client Secret:** cole o valor copiado
-7. Clique em **Sign in with Google** e autorize o acesso com sua conta do Google
-8. Clique em **Save**
-
----
-
-### 🚨 Alternativa: Configuração Direta nos Nós (Sem Credenciais Globais)
-
-Caso o seu n8n seja uma instância restrita onde você **não tem permissão** para acessar a aba "Credentials", você precisará adaptar os workflows para passar as chaves de acesso diretamente pelas configurações dos nós. Como fazer isso:
-
-#### Mercado Pago (Substituindo a Credencial)
-Em vez de usar a credencial `Header Auth`, você usará um nó genérico **HTTP Request**:
-- **Authentication:** `None`
-- **Send Headers:** Ativado (`true`)
-- Em **Headers**, adicione:
-  - **Name:** `Authorization`
-  - **Value:** `Bearer APP_USR-SEU_TOKEN_AQUI`
-
-#### E-mails (Substituindo o Gmail)
-Os nós nativos de Gmail e SMTP no n8n **exigem** a criação de uma credencial global. Se você não puder criar credenciais, **não será possível usar o Gmail diretamente**.
-**A solução:** Use um serviço de envio de e-mail por API (como [Resend](https://resend.com), [Brevo](https://www.brevo.com/pt/) ou [SendGrid](https://sendgrid.com)) que forneça uma chave de API (API Key).
-- No n8n, crie um nó **HTTP Request**:
-- **Method:** `POST`
-- **URL:** Endpoint da API (ex: `https://api.resend.com/emails`)
-- **Authentication:** `None`
-- **Send Headers:** Ativado → `Authorization: Bearer SUA_API_KEY`
-- **Send Body:** Ativado → Configure o JSON com o destinatário, assunto e corpo do e-mail.
-
-#### Google Sheets (Substituindo a Credencial Oauth2)
-O nó nativo do Google Sheets **exige** credencial global no n8n.
-**A solução:** Para ler e escrever dados na planilha sem o nó nativo, use ferramentas que transformam planilhas em APIs REST públicas (como [Sheet.best](https://sheet.best) ou [SheetDB](https://sheetdb.io)).
-- Elas fornecem uma URL única (ex: `https://sheet.best/api/sheets/123abc456`).
-- No n8n, use um nó **HTTP Request** enviando um `POST` para essa URL passando o JSON com os dados da aba para adicionar uma nova linha.
+> O nome exato `PostgreSQL - SalesChannel` é obrigatório — os workflows referenciam essa credential pelo nome.
 
 ---
 
@@ -145,13 +112,13 @@ Importe os workflows (ou crie via painel n8n):
 - **WF1 — MP Pagamento Aprovado** (`/webhook/mp-payment`)
   - Recebe webhook IPN do Mercado Pago
   - Consulta status real do pagamento
-  - Grava pedido no Google Sheets
+  - Grava pedido na tabela `saleschannel.pedidos` (PostgreSQL)
   - Envia e-mails para comprador e admin
-  
-- **WF2 — Admin API** (`/webhook/admin/...`)
-  - `GET /admin/orders` — lista/filtra pedidos
-  - `GET /admin/orders/:id` — detalhe
-  - `POST /admin/orders/:id/status` — atualiza status
+  - Atualiza status do pedido para `link_enviado`
+
+- **WF3 — Admin API** (`/webhook/admin`)
+  - `action: listar_pedidos` — lista pedidos com filtros SQL dinâmicos
+  - `action: atualizar_status` — atualiza `status_pedido` e `aprovado_em` no banco
 
 ### 4. Mercado Pago — Configuração do Webhook IPN
 
@@ -185,7 +152,10 @@ Para garantir que o webhook do n8n, a gravação na planilha e o envio de e-mail
    - Assim que o pagamento "fake" aprovar na tela, o Mercado Pago vai disparar o Webhook para a URL que você configurou no Passo 4.
    - Abra o n8n e vá na aba **Executions** (Execuções). Você deverá ver uma nova execução de sucesso.
 4. **Valide os Resultados**:
-   - Abra sua planilha (`SalesChannel - Pedidos`) e veja se uma nova linha foi inserida com `status_pagamento = aprovado`.
+   - Consulte a tabela no banco e veja se o registro foi inserido:
+     ```sql
+     SELECT * FROM saleschannel.pedidos ORDER BY criado_em DESC LIMIT 5;
+     ```
    - Verifique o e-mail que você usou na compra de teste: o e-mail de "Acesso Confirmado" deve ter chegado à sua caixa de entrada.
 
 > 💡 **Dica de Debug:** Se a execução não chegou ao n8n, confira se a URL configurada lá no painel do Mercado Pago está 100% correta (cuidado com `http` vs `https` e o caminho `/webhook/...`). Outra forma de testar se a URL está exposta para a internet é copiar a URL do seu webhook e colar no navegador; o n8n deve retornar a mensagem `{"message":"Workflow was started"}` (isso prova que o webhook está online).
@@ -283,4 +253,4 @@ Responda o e-mail de confirmação de compra ou entre em contato pelo Telegram d
 
 ---
 
-*SalesChannel — Afiliados Shopee | Fevereiro 2026*
+*SalesChannel — Afiliados Shopee | Março 2026 — Banco de dados migrado para PostgreSQL (`saleschannel.pedidos`)*

@@ -1,53 +1,87 @@
-# Configuração do Google Sheets — SalesChannel
+# Configuração do Banco de Dados — SalesChannel
 
-## 1. Criar a Planilha
+> **Atualizado em:** Março 2026 — controle de pedidos migrado de Google Sheets para **PostgreSQL**.
 
-1. Acesse [sheets.google.com](https://sheets.google.com) e crie uma nova planilha
-2. Renomeie para: **SalesChannel - Pedidos**
-3. Renomeie a aba padrão (Plan1) para: **pedidos**
+---
 
-## 2. Criar os Cabeçalhos (Linha 1)
+## 1. Pré-requisito: banco de dados PostgreSQL
 
-Na aba `pedidos`, preencha as células da linha 1 exatamente como abaixo:
+O projeto utiliza o banco `shopee_db`, que já deve estar em execução no ambiente (container Docker ou servidor). Dados de conexão:
 
-| A | B | C | D | E | F | G | H | I | J |
-|---|---|---|---|---|---|---|---|---|---|
-| order_id | nome | email | telegram_username | valor | status_pagamento | status_pedido | criado_em | aprovado_em | log_email |
+| Parâmetro | Valor |
+|-----------|-------|
+| Host | `db` |
+| Porta | `5432` |
+| Database | `shopee_db` |
+| User | `shopee_user` |
 
-> **Importante:** os nomes devem ser escritos exatamente assim (com underscore, sem espaços e sem acentos), pois o n8n os usa para mapear os dados.
+---
 
-## 3. Obter o ID da Planilha
+## 2. Criar o Schema e a Tabela
 
-A URL da sua planilha tem o seguinte formato:
-```
-https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms/edit
-```
+Execute o script `n8n-workflows/init-saleschannel.sql` no banco:
 
-O ID é a parte entre `/d/` e `/edit`:
-```
-1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms
+```bash
+psql -h db -U shopee_user -d shopee_db -f n8n-workflows/init-saleschannel.sql
 ```
 
-Copie este ID — você vai precisar dele nos workflows n8n.
+Ou copie e cole o conteúdo em qualquer client (pgAdmin, DBeaver, etc.).
 
-## 4. Substituir o ID nos Workflows n8n
+O script cria:
+- **Schema:** `saleschannel`
+- **Tabela:** `saleschannel.pedidos`
+- **Índices** para filtros frequentes (`status_pedido`, `status_pagamento`, `criado_em`, `email`)
 
-Nos arquivos `WF1-pagamento-aprovado.json` e `WF3-admin-api.json`, localize o texto:
-```
-1Llgir5nwJ1Kllgx_RKBS2XUbi6qohNWsb4N6Gan-7nE
-```
+### Estrutura da Tabela
 
-Substitua pelo ID copiado no passo anterior antes de importar no n8n.
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `order_id` | `TEXT` (PK) | ID do pagamento Mercado Pago |
+| `nome` | `TEXT` | Nome do comprador |
+| `email` | `TEXT` | E-mail do comprador |
+| `telegram_username` | `TEXT` | @username do Telegram |
+| `valor` | `NUMERIC(10,2)` | Valor pago (ex: `12.90`) |
+| `status_pagamento` | `TEXT` | `aprovado` \| `recusado` \| `estornado` |
+| `status_pedido` | `TEXT` | `novo` \| `link_enviado` \| `rejeitado` |
+| `criado_em` | `TIMESTAMPTZ` | Data/hora da criação |
+| `aprovado_em` | `TIMESTAMPTZ` | Data/hora da aprovação manual |
+| `log_email` | `TEXT` | Log do envio de e-mail |
 
-## 5. Configurar Credenciais no n8n
+---
 
-### Google Sheets (OAuth2)
-1. No n8n: **Configurações → Credenciais → Nova Credencial**
-2. Tipo: `Google Sheets OAuth2 API`
-3. Nome: `Google Sheets - SalesChannel`
-4. Faça login com a conta Google dona da planilha
+## 3. Criar a Credential PostgreSQL no n8n
+
+1. No n8n: **Settings → Credentials → New Credential**
+2. Tipo: **PostgreSQL**
+3. Preencha:
+
+| Campo | Valor |
+|---|---|
+| **Name** | `PostgreSQL - SalesChannel` |
+| **Host** | `db` |
+| **Database** | `shopee_db` |
+| **User** | `shopee_user` |
+| **Password** | `<sua senha>` |
+| **Port** | `5432` |
+
+4. Clique em **Save**
+
+> **Importante:** O nome da credential deve ser exatamente `PostgreSQL - SalesChannel`, pois os workflows referenciam esse nome.
+
+---
+
+## 4. Configurar Credenciais Restantes no n8n
+
+### Mercado Pago (HTTP Header Auth)
+
+1. Tipo: `HTTP Header Auth`
+2. Nome: `Mercado Pago - Access Token`
+3. Header Name: `Authorization`
+4. Header Value: `Bearer SEU_ACCESS_TOKEN_DE_PRODUCAO`
+   - Obtenha em: [developers.mercadopago.com](https://developers.mercadopago.com)
 
 ### Gmail SMTP
+
 1. Tipo: `SMTP`
 2. Nome: `Gmail SMTP - SalesChannel`
 3. Host: `smtp.gmail.com`
@@ -56,24 +90,21 @@ Substitua pelo ID copiado no passo anterior antes de importar no n8n.
 6. Password: **Senha de App do Google** (NÃO sua senha normal)
    - Gere em: myaccount.google.com → Segurança → Senhas de app
 
-### Mercado Pago (HTTP Header Auth)
-1. Tipo: `HTTP Header Auth`
-2. Nome: `Mercado Pago - Access Token`
-3. Header Name: `Authorization`
-4. Header Value: `Bearer SEU_ACCESS_TOKEN_DE_PRODUCAO`
-   - Obtenha em: developers.mercadopago.com
+---
 
-## 6. Importar Workflows no n8n
+## 5. Importar Workflows no n8n
 
 1. No n8n: **Workflows → Novo → Importar do arquivo**
 2. Importe `WF1-pagamento-aprovado.json`
-3. Repita para `WF3-admin-api.json`
-4. Em cada workflow, abra os nós do Google Sheets e selecione a planilha correta
+3. Importe `WF3-admin-api.json`
+4. Em cada workflow, abra os nós **PostgreSQL** e confirme que a credential `PostgreSQL - SalesChannel` está selecionada
 5. Configure os e-mails (de/para) nos nós `emailSend`
 6. No WF3, substitua `DEFINA_SUA_ADMIN_KEY_AQUI` por uma chave forte (ex: `sc_admin_2026_XXXXX`)
 7. Ative os dois workflows
 
-## 7. Configurar Webhook no Mercado Pago
+---
+
+## 6. Configurar Webhook no Mercado Pago
 
 1. Acesse [developers.mercadopago.com](https://developers.mercadopago.com)
 2. Sua Aplicação → **Configurar notificações**
@@ -81,30 +112,26 @@ Substitua pelo ID copiado no passo anterior antes de importar no n8n.
 4. Marque o evento: ✅ **Pagamentos**
 5. Salve
 
-## 8. Configurar Admin Panel
+---
+
+## 7. Configurar Admin Panel
 
 Abra `admin-panel/app.js` e edite:
 ```javascript
 const API_BASE = 'https://SEU_N8N_URL/webhook/admin'; // Sua URL n8n real
 ```
 
-Pronto! O painel lê os pedidos da API n8n que por sua vez lê o Google Sheets.
+O painel lê os pedidos da API n8n, que por sua vez consulta a tabela `saleschannel.pedidos` no PostgreSQL.
 
-## 9. Criar Link de Checkout no Mercado Pago
+---
 
-Crie uma preferência de pagamento com preço fixo R$12,90:
-1. No painel MP: **Cobranças → Criar cobrança**
-2. Valor: R$12,90
-3. Descrição: "Vídeos Prontos Diários — Afiliados Shopee (Vitalício)"
-4. Copie o link de pagamento gerado
-5. Use este link nos anúncios e posts
-
-> **Dica:** para capturar o username do comprador, adicione um campo personalizado na preferência via API antes de gerar o link.
-
-## 10. Testar o Fluxo Completo
+## 8. Testar o Fluxo Completo
 
 1. Use o **Sandbox do Mercado Pago** para fazer um pagamento de teste
-2. Verifique se o webhook chegou no n8n (Executions)
-3. Confirme o pedido na planilha Google Sheets
-4. Verifique o e-mail de confirmação
+2. Verifique se o webhook chegou no n8n (aba **Executions**)
+3. Confirme o registro inserido no banco:
+   ```sql
+   SELECT * FROM saleschannel.pedidos ORDER BY criado_em DESC LIMIT 5;
+   ```
+4. Verifique o e-mail de confirmação na caixa do comprador de teste
 5. Abra o painel admin e confirme que o pedido aparece

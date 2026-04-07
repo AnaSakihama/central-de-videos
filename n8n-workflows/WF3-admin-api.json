@@ -1,375 +1,242 @@
 {
-    "name": "WF3 — Admin API (SalesChannel)",
-    "nodes": [
-        {
-            "id": "node-webhook-admin",
-            "name": "Webhook Admin",
-            "type": "n8n-nodes-base.webhook",
-            "typeVersion": 2,
-            "position": [
-                250,
-                300
-            ],
-            "parameters": {
-                "httpMethod": "POST",
-                "path": "admin",
-                "responseMode": "responseNode",
-                "options": {}
+  "name": "WF3 — Admin API (SalesChannel)",
+  "nodes": [
+    {
+      "id": "node-webhook-admin",
+      "name": "Webhook Admin",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "admin",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-check-auth",
+      "name": "Verificar Admin Key",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [470, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-auth",
+              "leftValue": "={{ $json.headers['x-admin-key'] }}",
+              "rightValue": "DEFINA_SUA_ADMIN_KEY_AQUI",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
             }
-        },
-        {
-            "id": "node-check-auth",
-            "name": "Verificar Admin Key",
-            "type": "n8n-nodes-base.if",
-            "typeVersion": 2,
-            "position": [
-                470,
-                300
-            ],
-            "parameters": {
-                "conditions": {
-                    "options": {
-                        "caseSensitive": true,
-                        "leftValue": "",
-                        "typeValidation": "strict"
-                    },
-                    "conditions": [
-                        {
-                            "id": "cond-auth",
-                            "leftValue": "={{ $json.headers['x-admin-key'] }}",
-                            "rightValue": "DEFINA_SUA_ADMIN_KEY_AQUI",
-                            "operator": {
-                                "type": "string",
-                                "operation": "equals"
-                            }
-                        }
-                    ],
-                    "combinator": "and"
-                }
-            }
-        },
-        {
-            "id": "node-respond-unauthorized",
-            "name": "Resposta - Não Autorizado",
-            "type": "n8n-nodes-base.respondToWebhook",
-            "typeVersion": 1,
-            "position": [
-                690,
-                420
-            ],
-            "parameters": {
-                "options": {
-                    "responseCode": 401,
-                    "responseData": "{\"error\":\"Unauthorized\"}",
-                    "responseHeaders": {
-                        "entries": [
-                            {
-                                "name": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "id": "node-route",
-            "name": "Roteador de Rotas",
-            "type": "n8n-nodes-base.switch",
-            "typeVersion": 3,
-            "position": [
-                690,
-                250
-            ],
-            "parameters": {
-                "mode": "expression",
-                "output": "single",
-                "rules": {
-                    "rules": [
-                        {
-                            "outputKey": "listar",
-                            "value2": "listar_pedidos",
-                            "conditions": {
-                                "options": {
-                                    "caseSensitive": false,
-                                    "leftValue": "",
-                                    "typeValidation": "strict"
-                                },
-                                "conditions": [
-                                    {
-                                        "id": "route-list",
-                                        "leftValue": "={{ $json.body?.action || 'listar_pedidos' }}",
-                                        "rightValue": "listar_pedidos",
-                                        "operator": {
-                                            "type": "string",
-                                            "operation": "equals"
-                                        }
-                                    }
-                                ],
-                                "combinator": "and"
-                            }
-                        },
-                        {
-                            "outputKey": "atualizar",
-                            "value2": "atualizar_status",
-                            "conditions": {
-                                "options": {
-                                    "caseSensitive": false,
-                                    "leftValue": "",
-                                    "typeValidation": "strict"
-                                },
-                                "conditions": [
-                                    {
-                                        "id": "route-update",
-                                        "leftValue": "={{ $json.body?.action }}",
-                                        "rightValue": "atualizar_status",
-                                        "operator": {
-                                            "type": "string",
-                                            "operation": "equals"
-                                        }
-                                    }
-                                ],
-                                "combinator": "and"
-                            }
-                        }
-                    ]
-                },
-                "fallbackOutput": "none"
-            }
-        },
-        {
-            "id": "node-sheets-list",
-            "name": "Listar Pedidos do Sheets",
-            "type": "n8n-nodes-base.googleSheets",
-            "typeVersion": 4,
-            "position": [
-                910,
-                180
-            ],
-            "parameters": {
-                "operation": "getAll",
-                "documentId": {
-                    "__rl": true,
-                    "value": "1Llgir5nwJ1Kllgx_RKBS2XUbi6qohNWsb4N6Gan-7nE",
-                    "mode": "id"
-                },
-                "sheetName": {
-                    "__rl": true,
-                    "value": "pedidos",
-                    "mode": "name"
-                },
-                "filtersUI": {},
-                "options": {}
-            },
-            "credentials": {
-                "googleSheetsOAuth2Api": {
-                    "id": "2",
-                    "name": "Google Sheets - SalesChannel"
-                }
-            }
-        },
-        {
-            "id": "node-code-filter",
-            "name": "Filtrar e Serializar Pedidos",
-            "type": "n8n-nodes-base.code",
-            "typeVersion": 2,
-            "position": [
-                1130,
-                180
-            ],
-            "parameters": {
-                "mode": "runOnceForAllItems",
-                "jsCode": "// Pega parâmetros do request original\nconst body = $('Webhook Admin').first().json.body || {};\nconst query = $('Webhook Admin').first().json.query || {};\nconst search = (query.search || body.search || '').toLowerCase();\nconst statusPagamento = (query.status_pagamento || body.status_pagamento || '').toLowerCase();\nconst statusPedido = (query.status_pedido || body.status_pedido || '').toLowerCase();\n\n// Todos os pedidos vindos do Sheets\nlet orders = $input.all().map(i => i.json);\n\n// Aplicar filtros\nif (search) {\n  orders = orders.filter(o =>\n    (o.email || '').toLowerCase().includes(search) ||\n    (o.telegram_username || '').toLowerCase().includes(search) ||\n    (o.nome || '').toLowerCase().includes(search)\n  );\n}\nif (statusPagamento) {\n  orders = orders.filter(o => (o.status_pagamento || '').toLowerCase() === statusPagamento);\n}\nif (statusPedido) {\n  orders = orders.filter(o => (o.status_pedido || '').toLowerCase() === statusPedido);\n}\n\n// Ordenar por data de criação (mais recente primeiro)\norders.sort((a, b) => new Date(b.criado_em || 0) - new Date(a.criado_em || 0));\n\nreturn [{ json: { orders, total: orders.length } }];"
-            }
-        },
-        {
-            "id": "node-respond-list",
-            "name": "Resposta - Lista de Pedidos",
-            "type": "n8n-nodes-base.respondToWebhook",
-            "typeVersion": 1,
-            "position": [
-                1350,
-                180
-            ],
-            "parameters": {
-                "options": {
-                    "responseCode": 200,
-                    "responseData": "={{ JSON.stringify($json) }}",
-                    "responseHeaders": {
-                        "entries": [
-                            {
-                                "name": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "name": "Access-Control-Allow-Origin",
-                                "value": "*"
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "id": "node-sheets-update-status",
-            "name": "Atualizar Status no Sheets",
-            "type": "n8n-nodes-base.googleSheets",
-            "typeVersion": 4,
-            "position": [
-                910,
-                340
-            ],
-            "parameters": {
-                "operation": "update",
-                "documentId": {
-                    "__rl": true,
-                    "value": "1Llgir5nwJ1Kllgx_RKBS2XUbi6qohNWsb4N6Gan-7nE",
-                    "mode": "id"
-                },
-                "sheetName": {
-                    "__rl": true,
-                    "value": "pedidos",
-                    "mode": "name"
-                },
-                "columns": {
-                    "mappingMode": "defineBelow",
-                    "value": {
-                        "order_id": "={{ $('Webhook Admin').item.json.body.order_id }}",
-                        "status_pedido": "={{ $('Webhook Admin').item.json.body.status_pedido }}",
-                        "aprovado_em": "={{ $('Webhook Admin').item.json.body.aprovado_em || '' }}"
-                    },
-                    "matchingColumns": [
-                        "order_id"
-                    ],
-                    "schema": []
-                }
-            },
-            "credentials": {
-                "googleSheetsOAuth2Api": {
-                    "id": "2",
-                    "name": "Google Sheets - SalesChannel"
-                }
-            }
-        },
-        {
-            "id": "node-respond-update",
-            "name": "Resposta - Status Atualizado",
-            "type": "n8n-nodes-base.respondToWebhook",
-            "typeVersion": 1,
-            "position": [
-                1130,
-                340
-            ],
-            "parameters": {
-                "options": {
-                    "responseCode": 200,
-                    "responseData": "{\"success\":true,\"message\":\"Status atualizado com sucesso\"}",
-                    "responseHeaders": {
-                        "entries": [
-                            {
-                                "name": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "name": "Access-Control-Allow-Origin",
-                                "value": "*"
-                            }
-                        ]
-                    }
-                }
-            }
+          ],
+          "combinator": "and"
         }
-    ],
-    "connections": {
-        "Webhook Admin": {
-            "main": [
-                [
-                    {
-                        "node": "Verificar Admin Key",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Verificar Admin Key": {
-            "main": [
-                [
-                    {
-                        "node": "Roteador de Rotas",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                [
-                    {
-                        "node": "Resposta - Não Autorizado",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Roteador de Rotas": {
-            "main": [
-                [
-                    {
-                        "node": "Listar Pedidos do Sheets",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                [
-                    {
-                        "node": "Atualizar Status no Sheets",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Listar Pedidos do Sheets": {
-            "main": [
-                [
-                    {
-                        "node": "Filtrar e Serializar Pedidos",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Filtrar e Serializar Pedidos": {
-            "main": [
-                [
-                    {
-                        "node": "Resposta - Lista de Pedidos",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Atualizar Status no Sheets": {
-            "main": [
-                [
-                    {
-                        "node": "Resposta - Status Atualizado",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
+      }
+    },
+    {
+      "id": "node-respond-unauthorized",
+      "name": "Resposta - Não Autorizado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [690, 420],
+      "parameters": {
+        "options": {
+          "responseCode": 401,
+          "responseData": "{\"error\":\"Unauthorized\"}",
+          "responseHeaders": {
+            "entries": [{"name": "Content-Type", "value": "application/json"}]
+          }
         }
+      }
     },
-    "settings": {
-        "executionOrder": "v1"
+    {
+      "id": "node-route",
+      "name": "Roteador de Rotas",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [690, 250],
+      "parameters": {
+        "mode": "expression",
+        "output": "single",
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "listar",
+              "value2": "listar_pedidos",
+              "conditions": {
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"},
+                "conditions": [
+                  {
+                    "id": "route-list",
+                    "leftValue": "={{ $json.body?.action || 'listar_pedidos' }}",
+                    "rightValue": "listar_pedidos",
+                    "operator": {"type": "string", "operation": "equals"}
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "atualizar",
+              "value2": "atualizar_status",
+              "conditions": {
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"},
+                "conditions": [
+                  {
+                    "id": "route-update",
+                    "leftValue": "={{ $json.body?.action }}",
+                    "rightValue": "atualizar_status",
+                    "operator": {"type": "string", "operation": "equals"}
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "fallbackOutput": "none"
+      }
     },
-    "staticData": null,
-    "meta": {
-        "templateCredsSetupCompleted": false
+    {
+      "id": "node-code-build-query",
+      "name": "Montar Query de Listagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 180],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const body  = $('Webhook Admin').first().json.body  || {};\nconst query = $('Webhook Admin').first().json.query || {};\n\nconst search          = (query.search           || body.search           || '').toLowerCase();\nconst statusPagamento = (query.status_pagamento  || body.status_pagamento  || '').toLowerCase();\nconst statusPedido    = (query.status_pedido     || body.status_pedido     || '').toLowerCase();\n\nconst conditions = [];\nconst params     = [];\n\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(nome) LIKE $${p})`);\n}\nif (statusPagamento) {\n  params.push(statusPagamento);\n  conditions.push(`LOWER(status_pagamento) = $${params.length}`);\n}\nif (statusPedido) {\n  params.push(statusPedido);\n  conditions.push(`LOWER(status_pedido) = $${params.length}`);\n}\n\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql   = `SELECT * FROM saleschannel.pedidos ${where} ORDER BY criado_em DESC`;\n\nreturn [{ json: { sql, params } }];"
+      }
     },
-    "tags": [
-        "SalesChannel"
-    ]
+    {
+      "id": "node-pg-list",
+      "name": "Consultar Pedidos PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1130, 180],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.sql }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "10",
+          "name": "PostgreSQL - SalesChannel"
+        }
+      }
+    },
+    {
+      "id": "node-code-serialize",
+      "name": "Serializar Resposta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1350, 180],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const orders = $input.all().map(i => i.json);\nreturn [{ json: { orders, total: orders.length } }];"
+      }
+    },
+    {
+      "id": "node-respond-list",
+      "name": "Resposta - Lista de Pedidos",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1570, 180],
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseData": "={{ JSON.stringify($json) }}",
+          "responseHeaders": {
+            "entries": [
+              {"name": "Content-Type", "value": "application/json"},
+              {"name": "Access-Control-Allow-Origin", "value": "*"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "node-pg-update-status",
+      "name": "Atualizar Status no PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [910, 340],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE saleschannel.pedidos\nSET\n  status_pedido = '{{ $('Webhook Admin').item.json.body.status_pedido }}',\n  aprovado_em   = CASE\n    WHEN '{{ $('Webhook Admin').item.json.body.aprovado_em }}' <> ''\n    THEN '{{ $('Webhook Admin').item.json.body.aprovado_em }}'::TIMESTAMPTZ\n    ELSE aprovado_em\n  END\nWHERE order_id = '{{ $('Webhook Admin').item.json.body.order_id }}';"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "10",
+          "name": "PostgreSQL - SalesChannel"
+        }
+      }
+    },
+    {
+      "id": "node-respond-update",
+      "name": "Resposta - Status Atualizado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1130, 340],
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseData": "{\"success\":true,\"message\":\"Status atualizado com sucesso\"}",
+          "responseHeaders": {
+            "entries": [
+              {"name": "Content-Type", "value": "application/json"},
+              {"name": "Access-Control-Allow-Origin", "value": "*"}
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Admin": {
+      "main": [[{"node": "Verificar Admin Key", "type": "main", "index": 0}]]
+    },
+    "Verificar Admin Key": {
+      "main": [
+        [{"node": "Roteador de Rotas", "type": "main", "index": 0}],
+        [{"node": "Resposta - Não Autorizado", "type": "main", "index": 0}]
+      ]
+    },
+    "Roteador de Rotas": {
+      "main": [
+        [{"node": "Montar Query de Listagem", "type": "main", "index": 0}],
+        [{"node": "Atualizar Status no PostgreSQL", "type": "main", "index": 0}]
+      ]
+    },
+    "Montar Query de Listagem": {
+      "main": [[{"node": "Consultar Pedidos PostgreSQL", "type": "main", "index": 0}]]
+    },
+    "Consultar Pedidos PostgreSQL": {
+      "main": [[{"node": "Serializar Resposta", "type": "main", "index": 0}]]
+    },
+    "Serializar Resposta": {
+      "main": [[{"node": "Resposta - Lista de Pedidos", "type": "main", "index": 0}]]
+    },
+    "Atualizar Status no PostgreSQL": {
+      "main": [[{"node": "Resposta - Status Atualizado", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["SalesChannel"]
 }
