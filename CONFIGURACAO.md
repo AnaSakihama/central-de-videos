@@ -1,6 +1,6 @@
 # Configuração — sellingvideos (ex-SalesChannel)
 
-> **Atualizado em:** Abril 2026 — migrado para nova VPS `187.127.3.62` com Cloudflare Tunnel.
+> **Atualizado em:** Abril 2026 — migrado para nova VPS `187.127.3.62` com Cloudflare Tunnel e Nginx Proxy Manager.
 
 ---
 
@@ -9,11 +9,11 @@
 ```
 Mercado Pago (webhook)
         ↓
-https://n8n.saleschannel.com.br   ← Cloudflare Tunnel → saleschannel_n8n:5678
+https://n8n.saleschannel.com.br   ← Tunnel-n8n-saleschannel-prod → saleschannel_n8n:5678
         ↓
 saleschannel_postgres (PostgreSQL)
         ↓
-https://saleschannel.com.br/sellingvideos  ← NPM → saleschannel_portal → admin-panel/
+https://saleschannel.com.br/sellingvideos  ← Cloudflare Origin Cert → NPM → saleschannel_portal → admin-panel/
 ```
 
 ---
@@ -24,17 +24,22 @@ https://saleschannel.com.br/sellingvideos  ← NPM → saleschannel_portal → a
 |-----------|-------|
 | Container/Host | `saleschannel_postgres` |
 | Porta | `5432` |
-| Database | `shopee_db` *(confirmar após migração)* |
-| User | `shopee_user` |
+| User | *(valor de `POSTGRES_USER` no `.env` atual da VPS)* |
+| Password | *(valor de `POSTGRES_PASSWORD` no `.env` atual da VPS)* |
+
+> [!CAUTION]
+> Use sempre as credenciais que já estão no `.env` da VPS. Não sobrescreva o arquivo — o banco foi inicializado com esses valores.
 
 **Verificar tabela migrada:**
-```sql
-SELECT COUNT(*) FROM saleschannel.pedidos;
+```bash
+docker exec -it saleschannel_postgres psql -U <POSTGRES_USER> -c "\l"
+docker exec -it saleschannel_postgres psql -U <POSTGRES_USER> -d <nome_banco> \
+  -c "SELECT COUNT(*) FROM saleschannel.pedidos;"
 ```
 
 **Se precisar criar do zero:**
 ```bash
-docker exec -i saleschannel_postgres psql -U shopee_user -d shopee_db \
+docker exec -i saleschannel_postgres psql -U <POSTGRES_USER> -d <nome_banco> \
   < /root/apps/saleschannel/products/sellingvideos/n8n-workflows/init-saleschannel.sql
 ```
 
@@ -99,15 +104,9 @@ Gere em: myaccount.google.com → Segurança → Senhas de app
 
 ## 5. Nginx Proxy Manager (NPM)
 
-Acesse o NPM em `http://187.127.3.62:81` e configure:
-
-| Host | Destino interno | SSL |
-|---|---|---|
-| `saleschannel.com.br` | `http://saleschannel_portal:80` | Let's Encrypt |
-| `n8n.saleschannel.com.br` | via Cloudflare Tunnel | — |
-| `evolution.saleschannel.com.br` | via Cloudflare Tunnel | — |
-
-> O path `/sellingvideos` é servido automaticamente pelo `saleschannel_portal` que monta `/root/apps/saleschannel/products`.
+> [!CAUTION]
+> O proxy host `saleschannel.com.br` **já está configurado** com **Certificado de Origem Cloudflare (15 anos)**.
+> Não crie novamente nem troque para Let's Encrypt — isso causaria loop de redirecionamento.
 
 ---
 
