@@ -1,30 +1,30 @@
 -- =============================================================
 -- sellingvideos — Script de inicialização do banco PostgreSQL
--- Banco: sellingvideos_db | Host: saleschannel_postgres | Porta: 5432 | Owner: core
+-- Banco: sellingvideos_db | Host: saleschannel_postgres | Porta: 5432 | Owner: sellingvideos_user
 -- =============================================================
 
 -- 1. Criar schema dedicado ao projeto sellingvideos
-CREATE SCHEMA IF NOT EXISTS saleschannel AUTHORIZATION core;
+CREATE SCHEMA IF NOT EXISTS core AUTHORIZATION sellingvideos_user;
 
--- 2. Criar tabela de pedidos
-CREATE TABLE IF NOT EXISTS saleschannel.pedidos (
+-- 2. Criar tabela de orders
+CREATE TABLE IF NOT EXISTS core.orders (
   order_id          TEXT        PRIMARY KEY,
-  nome              TEXT,
+  name              TEXT,
   email             TEXT,
   telegram_username TEXT,
-  valor             NUMERIC(10,2),
-  status_pagamento  TEXT,          -- 'aprovado' | 'recusado' | 'estornado'
-  status_pedido     TEXT,          -- 'novo' | 'link_enviado' | 'rejeitado'
-  criado_em         TIMESTAMPTZ,
-  aprovado_em       TIMESTAMPTZ,
+  price             NUMERIC(10,2),
+  payment_status    TEXT,          -- 'aprovado' | 'recusado' | 'estornado'
+  order_status      TEXT,          -- 'novo' | 'link_enviado' | 'rejeitado'
+  created_at        TIMESTAMPTZ,
+  approved_at       TIMESTAMPTZ,
   log_email         TEXT
 );
 
 -- 3. Definir owner da tabela
-ALTER TABLE saleschannel.pedidos OWNER TO core;
+ALTER TABLE core.orders OWNER TO sellingvideos_user;
 
 -- 4. Índices úteis para filtros do painel admin
-CREATE INDEX IF NOT EXISTS idx_pedidos_status_pedido    ON saleschannel.pedidos (status_pedido);
-CREATE INDEX IF NOT EXISTS idx_pedidos_status_pagamento ON saleschannel.pedidos (status_pagamento);
-CREATE INDEX IF NOT EXISTS idx_pedidos_criado_em        ON saleschannel.pedidos (criado_em DESC);
-CREATE INDEX IF NOT EXISTS idx_pedidos_email            ON saleschannel.pedidos (email);
+CREATE INDEX IF NOT EXISTS idx_orders_order_status    ON core.orders (order_status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status  ON core.orders (payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at      ON core.orders (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_orders_email           ON core.orders (email);

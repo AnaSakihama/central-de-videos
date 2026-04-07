@@ -83,14 +83,12 @@ async function loadOrders() {
 // ── Stats ─────────────────────────────────────
 function updateStats() {
   document.getElementById('statTotal').textContent = allOrders.length;
-  // Valores de status_pedido conforme tabela saleschannel.pedidos:
-  // 'novo' | 'link_enviado' | 'rejeitado'
   document.getElementById('statAprovados').textContent =
-    allOrders.filter(o => o.status_pagamento === 'aprovado').length;
+    allOrders.filter(o => o.payment_status === 'aprovado').length;
   document.getElementById('statPendentes').textContent =
-    allOrders.filter(o => o.status_pedido === 'novo').length;
+    allOrders.filter(o => o.order_status === 'novo').length;
   document.getElementById('statLinkEnviado').textContent =
-    allOrders.filter(o => o.status_pedido === 'link_enviado').length;
+    allOrders.filter(o => o.order_status === 'link_enviado').length;
 }
 
 // ── Render Helpers ────────────────────────────
@@ -106,7 +104,7 @@ function paymentBadge(status) {
 }
 
 function orderBadge(status) {
-  // Valores conforme tabela saleschannel.pedidos
+  // Valores conforme tabela core.orders
   const map = {
     novo:         ['badge-gray',   '🆕', 'Novo'],
     link_enviado: ['badge-blue',   '📧', 'Link Enviado'],
@@ -144,9 +142,9 @@ function filterOrders() {
     const matchSearch = !search ||
       (o.email || '').toLowerCase().includes(search) ||
       (o.telegram_username || '').toLowerCase().includes(search) ||
-      (o.nome || '').toLowerCase().includes(search);
-    const matchPay = !payFilter || o.status_pagamento === payFilter;
-    const matchOrd = !orderFilter || o.status_pedido === orderFilter;
+      (o.name || '').toLowerCase().includes(search);
+    const matchPay = !payFilter || o.payment_status === payFilter;
+    const matchOrd = !orderFilter || o.order_status === orderFilter;
     return matchSearch && matchPay && matchOrd;
   });
 
@@ -154,9 +152,8 @@ function filterOrders() {
 }
 
 function renderPendingTable() {
-  // Pedidos que ainda precisam de ação: novos e com link enviado
   const pending = allOrders.filter(o =>
-    o.status_pedido === 'novo' || o.status_pedido === 'link_enviado'
+    o.order_status === 'novo' || o.order_status === 'link_enviado'
   );
   document.getElementById('pendingTable').innerHTML = buildTable(pending);
 }
@@ -169,12 +166,12 @@ function buildTable(orders) {
   const rows = orders.map(o => `
     <tr onclick="openOrderModal('${o.order_id}')">
       <td>${o.order_id || '—'}</td>
-      <td>${o.nome || '—'}</td>
+      <td>${o.name || '—'}</td>
       <td>${o.email || '—'}</td>
       <td>${o.telegram_username ? '@' + o.telegram_username.replace('@', '') : '—'}</td>
-      <td>${paymentBadge(o.status_pagamento)}</td>
-      <td>${orderBadge(o.status_pedido)}</td>
-      <td>${formatDate(o.criado_em)}</td>
+      <td>${paymentBadge(o.payment_status)}</td>
+      <td>${orderBadge(o.order_status)}</td>
+      <td>${formatDate(o.created_at)}</td>
     </tr>
   `).join('');
 
@@ -196,25 +193,25 @@ function openOrderModal(orderId) {
   const order = allOrders.find(o => o.order_id === orderId);
   if (!order) return;
 
-  const eligible = order.status_pagamento === 'aprovado';
+  const eligible = order.payment_status === 'aprovado';
   const eligibilityBlock = eligible
     ? `<div class="eligibility-ok">✅ Pagamento aprovado — elegível para entrada no canal.</div>`
     : `<div class="eligibility-fail">❌ Pagamento NÃO aprovado — não autorizar entrada.</div>`;
 
-  const canApprove = eligible && order.status_pedido !== 'rejeitado';
+  const canApprove = eligible && order.order_status !== 'rejeitado';
 
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-title">📋 Pedido #${order.order_id}</div>
     ${eligibilityBlock}
     <div style="margin-top:16px">
-      ${detailRow('Nome', order.nome || '—')}
+      ${detailRow('Nome', order.name || '—')}
       ${detailRow('E-mail', order.email || '—')}
       ${detailRow('Telegram', order.telegram_username ? '@' + order.telegram_username : '—')}
-      ${detailRow('Valor', 'R$' + (order.valor || '12,90'))}
-      ${detailRow('Status Pagamento', paymentBadge(order.status_pagamento))}
-      ${detailRow('Status Pedido', orderBadge(order.status_pedido))}
-      ${detailRow('Criado em', formatDate(order.criado_em))}
-      ${detailRow('Aprovado em', formatDate(order.aprovado_em))}
+      ${detailRow('Valor', 'R$' + (order.price || '12,90'))}
+      ${detailRow('Status Pagamento', paymentBadge(order.payment_status))}
+      ${detailRow('Status Pedido', orderBadge(order.order_status))}
+      ${detailRow('Criado em', formatDate(order.created_at))}
+      ${detailRow('Aprovado em', formatDate(order.approved_at))}
       ${detailRow('Log E-mail', order.log_email || '—')}
     </div>
     <div class="modal-actions">
@@ -260,8 +257,8 @@ async function updateStatus(orderId, newStatus) {
       body: JSON.stringify({
         action: 'atualizar_status',
         order_id: orderId,
-        status_pedido: newStatus,
-        aprovado_em: newStatus === 'link_enviado' ? new Date().toISOString() : ''
+        order_status: newStatus,
+        approved_at: newStatus === 'link_enviado' ? new Date().toISOString() : ''
       })
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

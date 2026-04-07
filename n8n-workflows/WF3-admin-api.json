@@ -1,5 +1,5 @@
 {
-  "name": "WF3 — Admin API (SalesChannel)",
+  "name": "WF3 — Admin API (sellingvideos)",
   "nodes": [
     {
       "id": "node-webhook-admin",
@@ -114,7 +114,7 @@
       "position": [910, 180],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const body  = $('Webhook Admin').first().json.body  || {};\nconst query = $('Webhook Admin').first().json.query || {};\n\nconst search          = (query.search           || body.search           || '').toLowerCase();\nconst statusPagamento = (query.status_pagamento  || body.status_pagamento  || '').toLowerCase();\nconst statusPedido    = (query.status_pedido     || body.status_pedido     || '').toLowerCase();\n\nconst conditions = [];\nconst params     = [];\n\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(nome) LIKE $${p})`);\n}\nif (statusPagamento) {\n  params.push(statusPagamento);\n  conditions.push(`LOWER(status_pagamento) = $${params.length}`);\n}\nif (statusPedido) {\n  params.push(statusPedido);\n  conditions.push(`LOWER(status_pedido) = $${params.length}`);\n}\n\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql   = `SELECT * FROM saleschannel.pedidos ${where} ORDER BY criado_em DESC`;\n\nreturn [{ json: { sql, params } }];"
+        "jsCode": "const body  = $('Webhook Admin').first().json.body  || {};\nconst query = $('Webhook Admin').first().json.query || {};\n\nconst search        = (query.search          || body.search          || '').toLowerCase();\nconst paymentStatus = (query.payment_status  || body.payment_status  || '').toLowerCase();\nconst orderStatus   = (query.order_status    || body.order_status    || '').toLowerCase();\n\nconst conditions = [];\nconst params     = [];\n\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\n\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql   = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\n\nreturn [{ json: { sql, params } }];"
       }
     },
     {
@@ -173,7 +173,7 @@
       "position": [910, 340],
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE saleschannel.pedidos\nSET\n  status_pedido = '{{ $('Webhook Admin').item.json.body.status_pedido }}',\n  aprovado_em   = CASE\n    WHEN '{{ $('Webhook Admin').item.json.body.aprovado_em }}' <> ''\n    THEN '{{ $('Webhook Admin').item.json.body.aprovado_em }}'::TIMESTAMPTZ\n    ELSE aprovado_em\n  END\nWHERE order_id = '{{ $('Webhook Admin').item.json.body.order_id }}';"
+        "query": "UPDATE core.orders\nSET\n  order_status = '{{ $('Webhook Admin').item.json.body.order_status }}',\n  approved_at  = CASE\n    WHEN '{{ $('Webhook Admin').item.json.body.approved_at }}' <> ''\n    THEN '{{ $('Webhook Admin').item.json.body.approved_at }}'::TIMESTAMPTZ\n    ELSE approved_at\n  END\nWHERE order_id = '{{ $('Webhook Admin').item.json.body.order_id }}';"
       },
       "credentials": {
         "postgres": {
@@ -238,5 +238,5 @@
   "meta": {
     "templateCredsSetupCompleted": false
   },
-  "tags": ["SalesChannel"]
+  "tags": ["sellingvideos"]
 }

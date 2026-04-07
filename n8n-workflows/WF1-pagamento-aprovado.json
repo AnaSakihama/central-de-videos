@@ -79,7 +79,7 @@
       "position": [910, 200],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const payment = $input.first().json;\nconst meta = payment.metadata || {};\nconst payer = payment.payer || {};\n\nconst nome = payer.first_name\n  ? `${payer.first_name} ${payer.last_name || ''}`.trim()\n  : (meta.nome || 'Afiliado');\n\nreturn [{\n  json: {\n    order_id: payment.id?.toString() || String(Date.now()),\n    nome: nome,\n    email: payer.email || meta.email || '',\n    telegram_username: meta.telegram_username || '',\n    valor: payment.transaction_amount?.toFixed(2) || '12.90',\n    status_pagamento: 'aprovado',\n    status_pedido: 'novo',\n    criado_em: new Date().toISOString(),\n    aprovado_em: null,\n    log_email: ''\n  }\n}];"
+        "jsCode": "const payment = $input.first().json;\nconst meta = payment.metadata || {};\nconst payer = payment.payer || {};\n\nconst name = payer.first_name\n  ? `${payer.first_name} ${payer.last_name || ''}`.trim()\n  : (meta.name || meta.nome || 'Afiliado');\n\nreturn [{\n  json: {\n    order_id: payment.id?.toString() || String(Date.now()),\n    name: name,\n    email: payer.email || meta.email || '',\n    telegram_username: meta.telegram_username || '',\n    price: payment.transaction_amount?.toFixed(2) || '12.90',\n    payment_status: 'aprovado',\n    order_status: 'novo',\n    created_at: new Date().toISOString(),\n    approved_at: null,\n    log_email: ''\n  }\n}];"
       }
     },
     {
@@ -90,7 +90,7 @@
       "position": [1130, 200],
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO saleschannel.pedidos\n  (order_id, nome, email, telegram_username, valor, status_pagamento, status_pedido, criado_em, aprovado_em, log_email)\nVALUES\n  ('{{ $json.order_id }}', '{{ $json.nome }}', '{{ $json.email }}', '{{ $json.telegram_username }}', {{ $json.valor }}, '{{ $json.status_pagamento }}', '{{ $json.status_pedido }}', '{{ $json.criado_em }}', NULL, '')\nON CONFLICT (order_id) DO UPDATE SET\n  status_pagamento = EXCLUDED.status_pagamento,\n  status_pedido    = EXCLUDED.status_pedido,\n  criado_em        = EXCLUDED.criado_em;"
+        "query": "INSERT INTO core.orders\n  (order_id, name, email, telegram_username, price, payment_status, order_status, created_at, approved_at, log_email)\nVALUES\n  ('{{ $json.order_id }}', '{{ $json.name }}', '{{ $json.email }}', '{{ $json.telegram_username }}', {{ $json.price }}, '{{ $json.payment_status }}', '{{ $json.order_status }}', '{{ $json.created_at }}', NULL, '')\nON CONFLICT (order_id) DO UPDATE SET\n  payment_status = EXCLUDED.payment_status,\n  order_status   = EXCLUDED.order_status,\n  created_at     = EXCLUDED.created_at;"
       },
       "credentials": {
         "postgres": {
@@ -110,7 +110,7 @@
         "toEmail": "={{ $('Montar Objeto do Pedido').item.json.email }}",
         "subject": "✅ Acesso Confirmado — Vídeos Prontos Diários para Afiliados Shopee",
         "emailType": "html",
-        "message": "=<div style=\"font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:0\">\n  <div style=\"background:linear-gradient(135deg,#6c63ff,#a78bfa);padding:32px;text-align:center\">\n    <h1 style=\"color:white;margin:0;font-size:24px\">📹 Acesso Confirmado!</h1>\n  </div>\n  <div style=\"background:white;padding:32px\">\n    <p style=\"font-size:16px;color:#333\">Olá <strong>{{ $('Montar Objeto do Pedido').item.json.nome }}</strong>!</p>\n    <p style=\"color:#555\">Seu pagamento de <strong>R$12,90</strong> foi aprovado com sucesso. Você agora tem acesso vitalício ao canal de vídeos prontos para afiliados Shopee.</p>\n    <div style=\"text-align:center;margin:32px 0\">\n      <a href=\"https://t.me/+N-22gpRv42MyMjhh\" style=\"background:#6c63ff;color:white;padding:16px 32px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold;font-size:16px\">👉 Solicitar Entrada no Canal Telegram</a>\n    </div>\n    <div style=\"background:#fff8e1;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin-bottom:20px\">\n      <strong>⚠️ Importante:</strong> sua entrada será aprovada manualmente em até <strong>8 horas</strong>.\n    </div>\n    <p style=\"color:#555\">• Certifique-se de que seu @username do Telegram está correto ao solicitar entrada.</p>\n    <p style=\"color:#555\">• Caso não tenha informado seu username, responda este e-mail com ele.</p>\n    <hr style=\"border:none;border-top:1px solid #eee;margin:24px 0\">\n    <p style=\"font-size:12px;color:#999\">SalesChannel — Afiliados Shopee | Pagamento único, acesso vitalício.</p>\n  </div>\n</div>",
+        "message": "=<div style=\"font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:0\">\n  <div style=\"background:linear-gradient(135deg,#6c63ff,#a78bfa);padding:32px;text-align:center\">\n    <h1 style=\"color:white;margin:0;font-size:24px\">📹 Acesso Confirmado!</h1>\n  </div>\n  <div style=\"background:white;padding:32px\">\n    <p style=\"font-size:16px;color:#333\">Olá <strong>{{ $('Montar Objeto do Pedido').item.json.name }}</strong>!</p>\n    <p style=\"color:#555\">Seu pagamento de <strong>R$12,90</strong> foi aprovado com sucesso. Você agora tem acesso vitalício ao canal de vídeos prontos para afiliados Shopee.</p>\n    <div style=\"text-align:center;margin:32px 0\">\n      <a href=\"https://t.me/+N-22gpRv42MyMjhh\" style=\"background:#6c63ff;color:white;padding:16px 32px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold;font-size:16px\">👉 Solicitar Entrada no Canal Telegram</a>\n    </div>\n    <div style=\"background:#fff8e1;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin-bottom:20px\">\n      <strong>⚠️ Importante:</strong> sua entrada será aprovada manualmente em até <strong>8 horas</strong>.\n    </div>\n    <p style=\"color:#555\">• Certifique-se de que seu @username do Telegram está correto ao solicitar entrada.</p>\n    <p style=\"color:#555\">• Caso não tenha informado seu username, responda este e-mail com ele.</p>\n    <hr style=\"border:none;border-top:1px solid #eee;margin:24px 0\">\n    <p style=\"font-size:12px;color:#999\">sellingvideos — Afiliados Shopee | Pagamento único, acesso vitalício.</p>\n  </div>\n</div>",
         "options": {}
       },
       "credentials": {
@@ -129,9 +129,9 @@
       "parameters": {
         "fromEmail": "COLE_SEU_EMAIL_AQUI@gmail.com",
         "toEmail": "COLE_SEU_EMAIL_ADMIN_AQUI@gmail.com",
-        "subject": "=🛒 Nova Compra — SalesChannel #{{ $('Montar Objeto do Pedido').item.json.order_id }}",
+        "subject": "=🛒 Nova Compra — sellingvideos #{{ $('Montar Objeto do Pedido').item.json.order_id }}",
         "emailType": "text",
-        "message": "=Nova compra recebida!\n\nOrder ID: {{ $('Montar Objeto do Pedido').item.json.order_id }}\nNome: {{ $('Montar Objeto do Pedido').item.json.nome }}\nE-mail: {{ $('Montar Objeto do Pedido').item.json.email }}\nTelegram: @{{ $('Montar Objeto do Pedido').item.json.telegram_username }}\nValor: R${{ $('Montar Objeto do Pedido').item.json.valor }}\nStatus: aprovado\nData: {{ $('Montar Objeto do Pedido').item.json.criado_em }}\n\nAcesse o painel admin para verificar e aprovar em até 8h.",
+        "message": "=Nova compra recebida!\n\nOrder ID: {{ $('Montar Objeto do Pedido').item.json.order_id }}\nName: {{ $('Montar Objeto do Pedido').item.json.name }}\nE-mail: {{ $('Montar Objeto do Pedido').item.json.email }}\nTelegram: @{{ $('Montar Objeto do Pedido').item.json.telegram_username }}\nPrice: R${{ $('Montar Objeto do Pedido').item.json.price }}\nStatus: aprovado\nDate: {{ $('Montar Objeto do Pedido').item.json.created_at }}\n\nAcesse o painel admin para verificar e aprovar em até 8h.",
         "options": {}
       },
       "credentials": {
@@ -149,7 +149,7 @@
       "position": [1790, 200],
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE saleschannel.pedidos\nSET\n  status_pedido = 'link_enviado',\n  log_email     = 'enviado em ' || NOW()::TEXT\nWHERE order_id = '{{ $('Montar Objeto do Pedido').item.json.order_id }}';"
+        "query": "UPDATE core.orders\nSET\n  order_status = 'link_enviado',\n  log_email    = 'enviado em ' || NOW()::TEXT\nWHERE order_id = '{{ $('Montar Objeto do Pedido').item.json.order_id }}';"
       },
       "credentials": {
         "postgres": {
@@ -166,7 +166,7 @@
       "position": [910, 420],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const payment = $input.first().json;\nconst statusMap = {\n  rejected: 'recusado',\n  cancelled: 'recusado',\n  refunded: 'estornado',\n  charged_back: 'estornado'\n};\nconst payer = payment.payer || {};\n\nreturn [{\n  json: {\n    order_id: payment.id?.toString() || '',\n    email: payer.email || '',\n    status_pagamento: statusMap[payment.status] || payment.status,\n    status_pedido: 'rejeitado'\n  }\n}];"
+        "jsCode": "const payment = $input.first().json;\nconst statusMap = {\n  rejected: 'recusado',\n  cancelled: 'recusado',\n  refunded: 'estornado',\n  charged_back: 'estornado'\n};\nconst payer = payment.payer || {};\n\nreturn [{\n  json: {\n    order_id: payment.id?.toString() || '',\n    email: payer.email || '',\n    payment_status: statusMap[payment.status] || payment.status,\n    order_status: 'rejeitado'\n  }\n}];"
       }
     },
     {
@@ -177,7 +177,7 @@
       "position": [1130, 420],
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO saleschannel.pedidos\n  (order_id, email, status_pagamento, status_pedido, criado_em)\nVALUES\n  ('{{ $json.order_id }}', '{{ $json.email }}', '{{ $json.status_pagamento }}', '{{ $json.status_pedido }}', NOW())\nON CONFLICT (order_id) DO UPDATE SET\n  status_pagamento = EXCLUDED.status_pagamento,\n  status_pedido    = EXCLUDED.status_pedido;"
+        "query": "INSERT INTO core.orders\n  (order_id, email, payment_status, order_status, created_at)\nVALUES\n  ('{{ $json.order_id }}', '{{ $json.email }}', '{{ $json.payment_status }}', '{{ $json.order_status }}', NOW())\nON CONFLICT (order_id) DO UPDATE SET\n  payment_status = EXCLUDED.payment_status,\n  order_status   = EXCLUDED.order_status;"
       },
       "credentials": {
         "postgres": {
@@ -223,5 +223,5 @@
   "meta": {
     "templateCredsSetupCompleted": false
   },
-  "tags": ["SalesChannel"]
+  "tags": ["sellingvideos"]
 }
