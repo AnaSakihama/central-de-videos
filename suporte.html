@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suporte — SellingVideos</title>
+    <meta name="description" content="Fale com o suporte do SellingVideos. Estamos aqui para ajudar!">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="landing-page/styles.css">
+    <style>
+        body { background: #f4f4f8; }
+
+        .support-hero {
+            background: linear-gradient(135deg, #6c63ff, #a78bfa);
+            padding: 4rem 1rem 3rem;
+            text-align: center;
+            color: #fff;
+        }
+        .support-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: .5rem; }
+        .support-hero p  { font-size: 1.05rem; opacity: .88; }
+
+        .support-container {
+            max-width: 660px;
+            margin: -2rem auto 3rem;
+            padding: 0 1rem;
+        }
+
+        .support-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 8px 40px rgba(108,99,255,.12);
+        }
+
+        .form-group { margin-bottom: 1.4rem; }
+
+        .form-group label {
+            display: block;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: .4rem;
+        }
+        .form-group label span.required { color: #e53e3e; margin-left: 2px; }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: .95rem;
+            color: #1a1a2e;
+            background: #f8f9ff;
+            transition: border-color .2s, box-shadow .2s;
+            box-sizing: border-box;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #6c63ff;
+            box-shadow: 0 0 0 3px rgba(108,99,255,.12);
+            background: #fff;
+        }
+        .form-group textarea { resize: vertical; min-height: 130px; }
+
+        .file-upload-area {
+            border: 2px dashed #c4b5fd;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+        }
+        .file-upload-area:hover { border-color: #6c63ff; background: #f0edff; }
+        .file-upload-area p { font-size: .88rem; color: #666; margin: .3rem 0 0; }
+        .file-upload-area input[type="file"] { display: none; }
+        .file-preview { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .8rem; }
+        .file-chip {
+            background: #ede9fe;
+            color: #5b21b6;
+            font-size: .8rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 100px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #6c63ff, #a78bfa);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: opacity .2s, transform .15s;
+            letter-spacing: .02em;
+        }
+        .btn-submit:hover  { opacity: .92; transform: translateY(-1px); }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        .form-notice {
+            font-size: .82rem;
+            color: #888;
+            text-align: center;
+            margin-top: .8rem;
+        }
+
+        /* Feedback states */
+        .feedback-box {
+            display: none;
+            border-radius: 12px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 1.5rem;
+            font-size: .95rem;
+            font-weight: 500;
+        }
+        .feedback-box.success {
+            background: #f0fff4;
+            border: 1.5px solid #68d391;
+            color: #276749;
+        }
+        .feedback-box.error {
+            background: #fff5f5;
+            border: 1.5px solid #fc8181;
+            color: #c53030;
+        }
+        .feedback-box.show { display: block; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #6c63ff;
+            font-size: .9rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        footer.footer { margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Hero -->
+    <div class="support-hero">
+        <h1>💬 Central de Suporte</h1>
+        <p>Preencha o formulário abaixo. Respondemos em até 24 horas úteis.</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="support-container">
+        <a href="index.html" class="back-link">← Voltar para a página inicial</a>
+
+        <div class="support-card">
+
+            <div id="feedback-success" class="feedback-box success">
+                ✅ <strong>Mensagem enviada com sucesso!</strong><br>
+                Nossa equipe entrará em contato pelo e-mail informado em até 24 horas úteis.
+            </div>
+            <div id="feedback-error" class="feedback-box error">
+                ❌ <strong>Não foi possível enviar a mensagem.</strong><br>
+                Tente novamente ou envie um e-mail diretamente para
+                <a href="mailto:admin@saleschannel.com.br">admin@saleschannel.com.br</a>.
+            </div>
+
+            <form id="supportForm" novalidate>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label for="nome">Nome <span class="required">*</span></label>
+                        <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone">Telefone / WhatsApp</label>
+                        <input type="tel" id="telefone" name="telefone" placeholder="(11) 91234-5678">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="titulo">Título / Assunto <span class="required">*</span></label>
+                    <input type="text" id="titulo" name="titulo" placeholder="Ex: Não recebi o e-mail de confirmação" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descricao">
+                        Descrição <span class="required">*</span>
+                        <span style="font-weight:400; color:#888; font-size:.82rem;">
+                            — Relate abaixo o que você necessita para que possamos atendê-lo o mais rápido possível.
+                        </span>
+                    </label>
+                    <textarea id="descricao" name="descricao"
+                        placeholder="Descreva sua dúvida ou problema com o máximo de detalhes possível..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Imagens <span style="font-weight:400; color:#888; font-size:.82rem;">— Anexe imagens caso tenha (opcional, máx. 3)</span></label>
+                    <div class="file-upload-area" onclick="document.getElementById('imagens').click()">
+                        <div style="font-size:2rem;">📎</div>
+                        <strong style="color:#6c63ff">Clique para anexar imagens</strong>
+                        <p>PNG, JPG ou GIF — até 3 arquivos</p>
+                        <input type="file" id="imagens" name="imagens" accept="image/*" multiple>
+                    </div>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    📤 Enviar Solicitação
+                </button>
+                <p class="form-notice">
+                    🔒 Suas informações são confidenciais e utilizadas apenas para atendimento.
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>SellingVideos &copy; 2026. Todos os direitos reservados.</p>
+            <div class="links">
+                <a href="suporte.html">Suporte</a> |
+                <a href="termos.html">Termos de Uso</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // ── File preview ───────────────────────────────────────
+    const imgInput   = document.getElementById('imagens');
+    const filePreview = document.getElementById('filePreview');
+    let selectedFiles = [];
+
+    imgInput.addEventListener('change', () => {
+        selectedFiles = Array.from(imgInput.files).slice(0, 3);
+        filePreview.innerHTML = selectedFiles
+            .map(f => `<span class="file-chip">📷 ${f.name}</span>`)
+            .join('');
+    });
+
+    // ── Converter imagem para base64 ───────────────────────
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload  = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ── Form submit ────────────────────────────────────────
+    document.getElementById('supportForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById('btnSubmit');
+        const successBox = document.getElementById('feedback-success');
+        const errorBox   = document.getElementById('feedback-error');
+
+        // Validação básica
+        const nome      = document.getElementById('nome').value.trim();
+        const email     = document.getElementById('email').value.trim();
+        const titulo    = document.getElementById('titulo').value.trim();
+        const descricao = document.getElementById('descricao').value.trim();
+        const telefone  = document.getElementById('telefone').value.trim();
+
+        if (!nome || !email || !titulo || !descricao) {
+            alert('Por favor, preencha todos os campos obrigatórios (*).');
+            return;
+        }
+
+        btn.disabled    = true;
+        btn.textContent = '⏳ Enviando...';
+        successBox.classList.remove('show');
+        errorBox.classList.remove('show');
+
+        // Converter imagens para base64
+        const imagens = [];
+        for (const file of selectedFiles) {
+            const b64 = await toBase64(file);
+            imagens.push({ nome: file.name, dados: b64 });
+        }
+
+        const payload = { nome, email, telefone, titulo, descricao, imagens };
+
+        try {
+            const res = await fetch(
+                'https://n8n.saleschannel.com.br/webhook/suporte',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            if (res.ok) {
+                successBox.classList.add('show');
+                document.getElementById('supportForm').reset();
+                filePreview.innerHTML = '';
+                selectedFiles = [];
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                throw new Error(`HTTP ${res.status}`);
+            }
+        } catch (err) {
+            console.error('Erro ao enviar:', err);
+            errorBox.classList.add('show');
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '📤 Enviar Solicitação';
+        }
+    });
+    </script>
+
+</body>
+</html>
