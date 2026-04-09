@@ -90,6 +90,34 @@ Gere em: myaccount.google.com → Segurança → Senhas de app
 6. No WF3: substitua `DEFINA_SUA_ADMIN_KEY_AQUI` por uma chave forte
 7. **Ative os dois workflows**
 
+## 4. Configuração do Telegram Bot (Automação de Acesso)
+
+O sistema agora utiliza um bot para liberar links de convite únicos e temporários.
+
+### Ativação do Bot
+1. **Bot do Telegram:** Use o Token `8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E`.
+2. **Webhook n8n:** Importe o `WF5-telegram-bot.json` no n8n.
+3. **Set Webhook:** Você deve avisar ao Telegram para onde enviar as mensagens. Substitua `URL_DO_WEBHOOK_PRODUCAO` pelo link gerado no nó "Webhook Telegram" do WF5:
+   `https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/setWebhook?url=URL_DO_WEBHOOK_PRODUCAO`
+4. **ID do Canal:**
+   - Adicione o bot `@divulgaVovo_bot` ao seu canal de vídeos como **Administrador**.
+   - Dê a ele permissão de **"Convidar usuários via link"**.
+   - No WF5, abra o nó "Gerar Link Temporário" e substitua `COLE_AQUI_O_CHAT_ID_DO_CANAL` pelo ID do seu canal (ex: `-100123456789`).
+
+## 5. Variáveis de Ambiente e Credenciais n8n
+
+| Sistema | Credencial / Variável | Descrição |
+|---|---|---|
+| **MP** | `Mercado Pago - Access Token` | Production Access Token do Mercado Pago |
+| **Email** | `Gmail SMTP - SalesChannel` | Conta de Gmail para envio (Use App Password) |
+| **Email** | `admin@saleschannel.com.br` | E-mail que recebe os relatórios de venda |
+| **DB** | `PostgreSQL - SalesChannel` | Host: `saleschannel_postgres`, DB: `sellingvideos_db` |
+| **TG** | `divulgaVovo_bot` | Token fornecido no WF5 |
+
+> [!CAUTION]
+> O proxy host `saleschannel.com.br` **já está configurado** com **Certificado de Origem Cloudflare (15 anos)**.
+> Não crie novamente nem troque para Let's Encrypt — isso causaria loop de redirecionamento.
+
 ---
 
 ## 4. Webhook Mercado Pago

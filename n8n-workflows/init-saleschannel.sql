@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS core.orders (
   order_status      TEXT,          -- 'novo' | 'link_enviado' | 'rejeitado'
   created_at        TIMESTAMPTZ,
   approved_at       TIMESTAMPTZ,
+  invite_code       TEXT,          -- Código único para o bot do telegram
+  code_used_at      TIMESTAMPTZ,   -- Quando o link temporário foi gerado
   log_email         TEXT
 );
 
@@ -36,3 +38,4 @@ CREATE INDEX IF NOT EXISTS idx_orders_order_status    ON core.orders (order_stat
 CREATE INDEX IF NOT EXISTS idx_orders_payment_status  ON core.orders (payment_status);
 CREATE INDEX IF NOT EXISTS idx_orders_created_at      ON core.orders (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orders_email           ON core.orders (email);
+CREATE INDEX IF NOT EXISTS idx_orders_invite_code     ON core.orders (invite_code);
