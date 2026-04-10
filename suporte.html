@@ -288,16 +288,16 @@
         successBox.classList.remove('show');
         errorBox.classList.remove('show');
 
-        // Converter imagens para base64
-        const imagens = [];
-        for (const file of selectedFiles) {
-            const b64 = await toBase64(file);
-            imagens.push({ nome: file.name, dados: b64 });
-        }
-
-        const payload = { nome, email, telefone, titulo, descricao, imagens };
-
         try {
+            // Converter imagens para base64
+            const imagens = [];
+            for (const file of selectedFiles) {
+                const b64 = await toBase64(file);
+                imagens.push({ nome: file.name, dados: b64 });
+            }
+
+            const payload = { nome, email, telefone, titulo, descricao, imagens };
+
             const res = await fetch(
                 'https://n8n.saleschannel.com.br/webhook/suporte',
                 {
@@ -319,6 +319,7 @@
         } catch (err) {
             console.error('Erro ao enviar:', err);
             errorBox.classList.add('show');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } finally {
             btn.disabled    = false;
             btn.textContent = '📤 Enviar Solicitação';
