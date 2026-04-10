@@ -86,8 +86,17 @@
             color: #5b21b6;
             font-size: .8rem;
             font-weight: 500;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 100px;
+            cursor: pointer;
+            transition: background .2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .file-chip:hover {
+            background: #ddd6fe;
+            color: #4c1d95;
         }
 
         .btn-submit {
@@ -246,11 +255,34 @@
     const filePreview = document.getElementById('filePreview');
     let selectedFiles = [];
 
-    imgInput.addEventListener('change', () => {
-        selectedFiles = Array.from(imgInput.files).slice(0, 3);
+    function renderPreview() {
         filePreview.innerHTML = selectedFiles
-            .map(f => `<span class="file-chip">📷 ${f.name}</span>`)
+            .map((f, index) => `
+                <span class="file-chip" onclick="removeFile(${index})" title="Clique para remover">
+                    📷 ${f.name} <span style="font-size:1.2em; margin-left:4px; opacity:0.6">&times;</span>
+                </span>
+            `)
             .join('');
+    }
+
+    window.removeFile = (index) => {
+        selectedFiles.splice(index, 1);
+        renderPreview();
+    };
+
+    imgInput.addEventListener('change', () => {
+        const newFiles = Array.from(imgInput.files);
+        newFiles.forEach(file => {
+            if (selectedFiles.length < 3) {
+                // Evitar duplicados (mesmo nome e tamanho)
+                const exists = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+                if (!exists) selectedFiles.push(file);
+            }
+        });
+        
+        // Limpa o input para permitir selecionar o mesmo arquivo novamente caso seja removido
+        imgInput.value = '';
+        renderPreview();
     });
 
     // ── Converter imagem para base64 ───────────────────────
