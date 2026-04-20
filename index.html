@@ -328,10 +328,19 @@
                 if (!response.ok) throw new Error('Falha ao gerar link de pagamento');
 
                 const data = await response.json();
-                if (data.url) {
-                    window.location.href = data.url;
+                console.log('Resposta do Checkout:', data);
+
+                // O n8n pode retornar um array [ { ... } ] ou um objeto direto { ... }
+                const result = Array.isArray(data) ? data[0] : data;
+
+                // Procura pela URL em diferentes campos possíveis
+                const checkoutUrl = result.url || result.init_point || result.sandbox_init_point;
+
+                if (checkoutUrl) {
+                    window.location.href = checkoutUrl;
                 } else {
-                    throw new Error('Link não recebido');
+                    console.error('URL não encontrada no objeto:', result);
+                    throw new Error('Link de checkout não encontrado na resposta');
                 }
             } catch (error) {
                 console.error(error);
