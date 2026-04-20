@@ -16,6 +16,34 @@
       }
     },
     {
+      "id": "node-filter-type",
+      "name": "Filtrar por Pagamento",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [410, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-is-payment",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "payment",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
       "id": "node-http-mp",
       "name": "Consultar Pagamento MP",
       "type": "n8n-nodes-base.httpRequest",
@@ -229,7 +257,8 @@
     }
   ],
   "connections": {
-    "Receber IPN Mercado Pago": { "main": [[{ "node": "Consultar Pagamento MP", "type": "main", "index": 0 }]] },
+    "Receber IPN Mercado Pago": { "main": [[{ "node": "Filtrar por Pagamento", "type": "main", "index": 0 }]] },
+    "Filtrar por Pagamento": { "main": [[{ "node": "Consultar Pagamento MP", "type": "main", "index": 0 }]] },
     "Consultar Pagamento MP": { "main": [[{ "node": "Detectar Status Pagamento", "type": "main", "index": 0 }]] },
     "Detectar Status Pagamento": {
       "main": [
