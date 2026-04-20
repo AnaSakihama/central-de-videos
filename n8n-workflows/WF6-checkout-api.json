@@ -8,7 +8,7 @@
       "typeVersion": 2,
       "position": [250, 300],
       "parameters": {
-        "httpMethod": "POST",
+        "httpMethod": "GET",
         "path": "checkout",
         "responseMode": "responseNode",
         "options": {}
@@ -39,7 +39,7 @@
           "parameters": []
         },
         "specifyBody": "json",
-        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício SellingVideos VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $json.body?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\"\n}",
+        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício SellingVideos VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\"\n}",
         "options": {}
       },
       "credentials": {

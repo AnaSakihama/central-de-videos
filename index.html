@@ -319,10 +319,10 @@
             btn.innerHTML = '<span class="spinner"></span> Criando Checkout Seguro...';
 
             try {
-                const response = await fetch(API_CHECKOUT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
+                // Usando GET para evitar problemas de CORS pre-flight
+                const response = await fetch(`${API_CHECKOUT}?email=${encodeURIComponent(email)}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
                 });
 
                 if (!response.ok) throw new Error('Falha ao gerar link de pagamento');
