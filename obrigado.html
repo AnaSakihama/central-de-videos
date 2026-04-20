@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Recebido | SellingVideos VIP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="landing-page/styles.css">
+    <style>
+        body {
+            background: #f8f9fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .success-card {
+            background: #fff;
+            max-width: 500px;
+            width: 100%;
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(108,99,255,0.12);
+        }
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: #6c63ff;
+            color: #fff;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            animation: bounceIn 0.8s ease;
+        }
+        h1 {
+            font-size: 1.8rem;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        .steps-box {
+            background: #f0efff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+        .step-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            color: #444;
+        }
+        .step-num {
+            background: #6c63ff;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .btn-telegram {
+            background: #0088cc;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 700;
+            transition: transform 0.2s;
+        }
+        .btn-telegram:hover { transform: translateY(-2px); }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-card">
+        <div class="icon-circle">✅</div>
+        <h1>Pedido Recebido!</h1>
+        <p>Parabéns por garantir o seu acesso ao <strong>SellingVideos VIP</strong>. Nossa automação já está processando sua entrada.</p>
+        
+        <div class="steps-box">
+            <div class="step-item">
+                <div class="step-num">1</div>
+                <span>Aguarde a confirmação do Mercado Pago (Pix e Cartão são imediatos).</span>
+            </div>
+            <div class="step-item">
+                <div class="step-num">2</div>
+                <span>Você receberá um <strong>e-mail</strong> com o seu código de acesso exclusivo.</span>
+            </div>
+            <div class="step-item">
+                <div class="step-num">3</div>
+                <span>Clique no link do e-mail para abrir o Bot e entrar no Canal.</span>
+            </div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: #999;">Dica: Verifique sua pasta de Spam ou Promoções se não encontrar o e-mail em 5 minutos.</p>
+
+        <div style="border-top: 1px solid #eee; padding-top: 2rem;">
+            <p style="margin-bottom: 1rem; font-weight: 600;">Precisa de ajuda urgente?</p>
+            <a href="https://t.me/seu_usuario_suporte" class="btn-telegram">Falar com o Suporte</a>
+        </div>
+    </div>
+</body>
+</html>

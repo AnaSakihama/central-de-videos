@@ -126,9 +126,12 @@
                 Afiliado Shopee, Amazon, Mercado Livre ou AliExpress — não importa.<br>
                 <strong>O conteúdo que vende está aqui.</strong>
             </p>
-            <a href="https://mpago.la/2fSr7w7" class="cta-button primary" id="btn-hero">
-                ⚡ Quero Meu Acesso Vitalício — R$ 12,90
-            </a>
+            <div class="checkout-container" style="max-width: 400px; margin: 0 auto;">
+                <input type="email" id="email-hero" placeholder="Seu melhor e-mail..." class="email-input">
+                <button class="cta-button primary" id="btn-hero" style="width: 100%; cursor: pointer;">
+                    ⚡ Quero Meu Acesso Vitalício — R$ 12,90
+                </button>
+            </div>
             <p class="hero-guarantee">🔒 Pagamento 100% seguro via Mercado Pago</p>
         </div>
     </header>
@@ -266,9 +269,12 @@
         <div class="container">
             <h2>👇 Dê o próximo passo para escalar suas vendas</h2>
             <p>Com mais praticidade, mais conteúdo e mais tempo livre.<br>Clique abaixo e garanta o seu acesso agora mesmo.</p>
-            <a href="https://mpago.la/2fSr7w7" class="cta-button primary" id="btn-cta-final" style="font-size:1.15rem; padding: 18px 40px;">
-                ⚡ Garantir Meu Acesso Vitalício — R$ 12,90
-            </a>
+            <div class="checkout-container" style="max-width: 400px; margin: 0 auto;">
+                <input type="email" id="email-final" placeholder="Seu melhor e-mail..." class="email-input" style="border-color: rgba(255,255,255,0.4);">
+                <button id="btn-cta-final" class="cta-button primary" style="width: 100%; font-size:1.15rem; padding: 18px 40px; cursor: pointer;">
+                    ⚡ Garantir Meu Acesso Vitalício — R$ 12,90
+                </button>
+            </div>
             <div class="guarantee-strip">
                 <span>🔒 Pagamento seguro</span>
                 <span>♾️ Acesso vitalício</span>
@@ -290,5 +296,89 @@
         </div>
     </footer>
 
+    <!-- ── SCRIPTS ────────────────────────────────────────────── -->
+    <script>
+        const API_CHECKOUT = 'https://n8n.saleschannel.com.br/webhook/checkout';
+
+        async function handlePurchaseClick(e) {
+            const btn = e.currentTarget;
+            const inputId = btn.id === 'btn-hero' ? 'email-hero' : 'email-final';
+            const emailInput = document.getElementById(inputId);
+            const email = emailInput.value.trim();
+
+            // Validação simples de e-mail
+            if (!email || !email.includes('@')) {
+                alert('Por favor, insira um e-mail válido para receber o seu acesso.');
+                emailInput.focus();
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            btn.innerHTML = '<span class="spinner"></span> Criando Checkout Seguro...';
+
+            try {
+                const response = await fetch(API_CHECKOUT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                if (!response.ok) throw new Error('Falha ao gerar link de pagamento');
+
+                const data = await response.json();
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error('Link não recebido');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao iniciar checkout. Tente novamente em alguns instantes.');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.innerHTML = originalText;
+            }
+        }
+
+        document.getElementById('btn-hero').addEventListener('click', handlePurchaseClick);
+        document.getElementById('btn-cta-final').addEventListener('click', handlePurchaseClick);
+    </script>
+
+    <style>
+        .email-input {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,159,67,0.4);
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            outline: none;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .email-input::placeholder { color: rgba(255,255,255,0.6); }
+        .email-input:focus {
+            border-color: #ff9f43;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 15px rgba(255,159,67,0.2);
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </script>
 </body>
 </html>

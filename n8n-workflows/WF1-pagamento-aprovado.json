@@ -109,11 +109,39 @@
       }
     },
     {
+      "id": "node-if-status-email",
+      "name": "Verificar Status para Email",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 200],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-status-email",
+              "leftValue": "={{ $json.payment_status }}",
+              "rightValue": "aprovado",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
       "id": "node-email-buyer",
       "name": "Email Comprador - Acesso VIP",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [1400, 160],
+      "position": [1650, 100],
       "parameters": {
         "fromEmail": "COLE_SEU_EMAIL_AQUI@gmail.com",
         "toEmail": "={{ $json.email }}",
@@ -134,7 +162,7 @@
       "name": "Email Comprador - Pedido Recebido",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [1400, 260],
+      "position": [1650, 300],
       "parameters": {
         "fromEmail": "COLE_SEU_EMAIL_AQUI@gmail.com",
         "toEmail": "={{ $json.email }}",
@@ -211,11 +239,12 @@
       ]
     },
     "Montar Objeto do Pedido": { "main": [[{ "node": "Gravar Pedido no PostgreSQL", "type": "main", "index": 0 }]] },
-    "Gravar Pedido no PostgreSQL": {
-      "main": [[
-        { "node": "Email Comprador - Acesso VIP", "type": "main", "index": 0 },
-        { "node": "Email Comprador - Pedido Recebido", "type": "main", "index": 0 }
-      ]]
+    "Gravar Pedido no PostgreSQL": { "main": [[{ "node": "Verificar Status para Email", "type": "main", "index": 0 }]] },
+    "Verificar Status para Email": {
+      "main": [
+        [{ "node": "Email Comprador - Acesso VIP", "type": "main", "index": 0 }],
+        [{ "node": "Email Comprador - Pedido Recebido", "type": "main", "index": 0 }]
+      ]
     },
     "Email Comprador - Acesso VIP": { "main": [[{ "node": "Email Admin - Relatório", "type": "main", "index": 0 }]] },
     "Email Comprador - Pedido Recebido": { "main": [[{ "node": "Email Admin - Relatório", "type": "main", "index": 0 }]] },

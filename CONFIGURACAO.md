@@ -62,11 +62,36 @@ Importe os arquivos da pasta `n8n-workflows/` na seguinte ordem:
 
 ---
 
-## 5. Estrutura de URLs (Produção)
+## 6. Configuração do Mercado Pago (Automática via API)
+
+O projeto agora utiliza o **Checkout Pro via API**, o que elimina a necessidade de configurar URLs de retorno manualmente para cada link.
+
+### 6.1 — Ativando o Checkout API
+1. Importe o arquivo `n8n-workflows/WF6-checkout-api.json` no seu n8n.
+2. Certifique-se de que a credencial `Mercado Pago - Access Token` está selecionada no nó "Criar Preferência MP".
+3. Ative o workflow (botão **Active**).
+
+### 6.2 — Notificações de Pagamento (IPN)
+Mesmo com o checkout automático, você ainda precisa configurar a IPN para que o n8n receba o aviso de pagamento aprovado:
+1. Vá para o portal [Mercado Pago Developers](https://developers.mercadopago.com/panel).
+2. Selecione sua aplicação e clique em **Notificações IPN**.
+3. No campo **URL de Notificação**, insira:
+   `https://n8n.saleschannel.com.br/webhook/mp-payment`
+4. Marque o evento **Pagamentos** (payments) e salve.
+
+---
+
+## 7. Depuração (O que fazer se nada acontecer?)
+
+1. **Erro ao Clicar no Botão:** Verifique o Console do Navegador (F12). Se houver erro de CORS, certifique-se de que o nó de resposta no n8n possui o header `Access-Control-Allow-Origin: *`.
+2. **Checkout não abre:** Verifique as execuções do `WF6`. Se houver erro 401, o seu Access Token do Mercado Pago expirou ou foi revogado.
+3. **Não redireciona após pagar:** O redirecionamento automático pelo Mercado Pago só ocorre se o pagamento for aprovado instantaneamente (Pix/Cartão). Para boletos, ele mostrará a tela de sucesso do MP.
+
+---
+
+## 8. Estrutura de URLs (Produção)
 
 - **Landing Page:** `https://saleschannel.com.br/sellingvideos`
-- **Painel Admin:** `https://saleschannel.com.br/sellingvideos/admin-panel`
-- **API n8n:** `https://n8n.saleschannel.com.br`
-
-> [!CAUTION]
-> O certificado SSL é gerenciado pela Cloudflare (Origin Cert 15 anos). O NPM na VPS já está configurado. **NÃO** tente gerar certificados Let's Encrypt para o domínio `saleschannel.com.br`, pois causará erro de SSL.
+- **Checkout API:** `https://n8n.saleschannel.com.br/webhook/checkout`
+- **Webhook IPN:** `https://n8n.saleschannel.com.br/webhook/mp-payment`
+- **Obrigado:** `https://saleschannel.com.br/sellingvideos/obrigado.html`
