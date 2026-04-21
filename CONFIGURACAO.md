@@ -69,9 +69,14 @@ O projeto agora utiliza o **Checkout Pro via API**, o que elimina a necessidade 
 ### 6.1 — Ativando o Checkout API
 1. Importe o arquivo `n8n-workflows/WF6-checkout-api.json` no seu n8n.
 2. Certifique-se de que a credencial `Mercado Pago - Access Token` está selecionada no nó "Criar Preferência MP".
-3. Ative o workflow (botão **Active**).
+3. No painel do Mercado Pago (Dados do Negócio), configure o seu **Nome Fantasia** como "Início" ou o nome que deseja que apareça no botão de retorno.
+4. Ative o workflow.
 
-### 6.2 — Notificações de Pagamento (IPN)
+### 6.2 — Workflow V3 (Pagamento + Merchant Order)
+O arquivo `n8n-workflows/WF1-pagamento-aprovado.json` agora é a **versão V3**. 
+- Ele suporta tanto notificações de `payment` quanto de `merchant_order`.
+- Se ele receber um pedido, ele busca automaticamente os pagamentos vinculados e processa o que estiver aprovado.
+- Isso evita que o fluxo pare caso o Mercado Pago envie o aviso de "Pedido" antes do aviso de "Pagamento".
 Mesmo com o checkout automático, você ainda precisa configurar a IPN para que o n8n receba o aviso de pagamento aprovado:
 1. Vá para o portal [Mercado Pago Developers](https://developers.mercadopago.com/panel).
 2. Selecione sua aplicação e clique em **Notificações IPN**.
