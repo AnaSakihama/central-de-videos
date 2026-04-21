@@ -309,11 +309,165 @@
           "id": "PPEXcNJ5kjQ8UbuR",
           "name": "PostgresSalesChannel"
         }
+         {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-approved-not-sent",
+              "leftValue": "={{ $json.payment_status }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "aprovado"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "619f5f28-c28c-4bf1-a7a0-bf22426dcd47",
+      "name": "Status Aprovado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        30,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-pending-not-sent",
+              "leftValue": "={{ $json.payment_status }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "pendente"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-if-pending",
+      "name": "Status Pendente?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        30,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = '{{ $json.order_id }}';",
+        "options": {}
+      },
+      "id": "node-mark-vip-sent",
+      "name": "Marcar E-mail VIP Enviado",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        420,
+        -220
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "PPEXcNJ5kjQ8UbuR",
+          "name": "PostgresSalesChannel"
+        }
       }
     },
     {
       "parameters": {
-        "conditions": {\n          "options": {\n            "caseSensitive": true,\n            "leftValue": "",\n            "typeValidation": "strict"\n          },\n          "conditions": [\n            {\n              \"id\": \"cond-approved-not-sent\",\n              \"leftValue\": \"={{ $json.payment_status }}\",\n              \"operator\": { \"type\": \"string\", \"operation\": \"equals\" },\n              \"rightValue\": \"aprovado\"\n            }\n          ],\n          \"combinator\": \"and\"\n        },\n        \"options\": {}\n      },\n      \"id\": \"619f5f28-c28c-4bf1-a7a0-bf22426dcd47\",\n      \"name\": \"Status Aprovado?\",\n      \"type\": \"n8n-nodes-base.if\",\n      \"typeVersion\": 2,\n      \"position\": [\n        30,\n        -120\n      ]\n    },\n    {\n      \"parameters\": {\n        \"conditions\": {\n          \"options\": {\n            \"caseSensitive\": true,\n            \"leftValue\": \"\",\n            \"typeValidation\": \"strict\"\n          },\n          \"conditions\": [\n            {\n              \"id\": \"cond-pending-not-sent\",\n              \"leftValue\": \"={{ $json.payment_status }}\",\n              \"operator\": { \"type\": \"string\", \"operation\": \"equals\" },\n              \"rightValue\": \"pendente\"\n            }\n          ],\n          \"combinator\": \"and\"\n        },\n        \"options\": {}\n      },\n      \"id\": \"node-if-pending\",\n      \"name\": \"Status Pendente?\",\n      \"type\": \"n8n-nodes-base.if\",\n      \"typeVersion\": 2,\n      \"position\": [\n        30,\n        80\n      ]\n    },\n    {\n      \"parameters\": {\n        \"operation\": \"executeQuery\",\n        \"query\": \"UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = '{{ $json.order_id }}';\",\n        \"options\": {}\n      },\n      \"id\": \"node-mark-vip-sent\",\n      \"name\": \"Marcar E-mail VIP Enviado\",\n      \"type\": \"n8n-nodes-base.postgres\",\n      \"typeVersion\": 2,\n      \"position\": [\n        420,\n        -220\n      ],\n      \"credentials\": {\n        \"postgres\": { \"id\": \"PPEXcNJ5kjQ8UbuR\", \"name\": \"PostgresSalesChannel\" }\n      }\n    },\n    {\n      \"parameters\": {\n        \"operation\": \"executeQuery\",\n        \"query\": \"UPDATE core.orders SET log_email = 'PENDENTE_ENVIADO' WHERE order_id = '{{ $json.order_id }}';\",\n        \"options\": {}\n      },\n      \"id\": \"node-mark-pending-sent\",\n      \"name\": \"Marcar E-mail Pendente Enviado\",\n      \"type\": \"n8n-nodes-base.postgres\",\n      \"typeVersion\": 2,\n      \"position\": [\n        420,\n        -20\n      ],\n      \"credentials\": {\n        \"postgres\": { \"id\": \"PPEXcNJ5kjQ8UbuR\", \"name\": \"PostgresSalesChannel\" }\n      }\n    },\n    {\n      \"parameters\": {\n        \"operation\": \"executeQuery\",\n        \"query\": \"SELECT log_email FROM core.orders WHERE order_id = '{{ $json.order_id }}' LIMIT 1;\",\n        \"options\": {}\n      },\n      \"id\": \"node-check-sent-state\",\n      \"name\": \"Consultar Estado Envio\",\n      \"type\": \"n8n-nodes-base.postgres\",\n      \"typeVersion\": 2,\n      \"position\": [\n        -320,\n        -20\n      ],\n      \"credentials\": {\n        \"postgres\": { \"id\": \"PPEXcNJ5kjQ8UbuR\", \"name\": \"PostgresSalesChannel\" }\n      }\n    },\n    {\n      \"parameters\": {\n        \"conditions\": {\n          \"options\": {\n            \"caseSensitive\": true,\n            \"leftValue\": \"\",\n            \"typeValidation\": \"strict\"\n          },\n          \"conditions\": [\n            {\n              \"id\": \"cond-already-sent\",\n              \"leftValue\": \"={{ $json.log_email }}\",\n              \"operator\": { \"type\": \"string\", \"operation\": \"notEmpty\" }\n            }\n          ],\n          \"combinator\": \"and\"\n        },\n        \"options\": {}\n      },\n      \"id\": \"node-if-already-sent\",\n      \"name\": \"Já Enviado?\",\n      \"type\": \"n8n-nodes-base.if\",\n      \"typeVersion\": 2,\n      \"position\": [\n        -120,\n        -20\n      ]\n    },
+        "operation": "executeQuery",
+        "query": "UPDATE core.orders SET log_email = 'PENDENTE_ENVIADO' WHERE order_id = '{{ $json.order_id }}';",
+        "options": {}
+      },
+      "id": "node-mark-pending-sent",
+      "name": "Marcar E-mail Pendente Enviado",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        420,
+        -20
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "PPEXcNJ5kjQ8UbuR",
+          "name": "PostgresSalesChannel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT log_email FROM core.orders WHERE order_id = '{{ $json.order_id }}' LIMIT 1;",
+        "options": {}
+      },
+      "id": "node-check-sent-state",
+      "name": "Consultar Estado Envio",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -20
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "PPEXcNJ5kjQ8UbuR",
+          "name": "PostgresSalesChannel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-already-sent",
+              "leftValue": "={{ $json.log_email }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-if-already-sent",
+      "name": "Já Enviado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        -20
+      ]
+    },
+ ]\n    },
     {
       "parameters": {
         "fromEmail": "saleschannel.admin@gmail.com",
