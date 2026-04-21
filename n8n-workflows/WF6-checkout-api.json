@@ -28,7 +28,7 @@
       ],
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT order_id FROM core.orders WHERE email = '{{ $json.query?.email }}' AND payment_status = 'aprovado' LIMIT 1;",
+        "query": "SELECT order_id FROM core.orders WHERE email = '{{ $node[\"Webhook Checkout\"].json.query?.email }}' AND payment_status = 'aprovado' LIMIT 1;",
         "options": {}
       },
       "credentials": {
@@ -125,7 +125,7 @@
           "parameters": []
         },
         "specifyBody": "json",
-        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício SellingVideos VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $('Verificar Compra Ativa').item.json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $('Verificar Compra Ativa').item.json.query?.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
+        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício SellingVideos VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node[\\\"Webhook Checkout\\\"].json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node[\\\"Webhook Checkout\\\"].json.query?.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
         "options": {}
       },
       "credentials": {
