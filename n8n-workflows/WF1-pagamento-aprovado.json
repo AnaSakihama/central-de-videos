@@ -284,7 +284,75 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at, log_email) VALUES ('{{$json.order_id}}', '{{$json.name}}', '{{$json.email}}', {{$json.price}}, '{{$json.payment_status}}', '{{$json.invite_code}}', '{{$json.created_at}}', '') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status;",
+        "query": "SELECT order_id, invite_code FROM core.orders WHERE email = '{{ $json.email }}' AND payment_status = 'aprovado' AND order_id != '{{ $json.order_id }}' LIMIT 1;",
+        "options": {}
+      },
+      "id": "verificar-compra-existente",
+      "name": "Verificar Compra Existente",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "PPEXcNJ5kjQ8UbuR",
+          "name": "PostgresSalesChannel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "has-access",
+              "leftValue": "={{ $json.order_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        }
+      },
+      "id": "if-already-has-access",
+      "name": "Já possui acesso?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        150,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "saleschannel.admin@gmail.com",
+        "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
+        "subject": "⚠️ Aviso: Você já possui acesso VIP!",
+        "emailFormat": "html",
+        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">\n  <h2>Você já possui acesso!</h2>\n  <p>Verificamos que você já possui uma compra aprovada em nosso sistema com este e-mail.</p>\n  <p>Seu código de acesso original é: <b>{{ $json.invite_code }}</b></p>\n  <p>Para entrar no canal VIP agora, clique abaixo:</p>\n  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">\n    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\">\n      <a href=\"https://t.me/divulgaVovo_bot?start={{ $json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">👉 Reativar Acesso</a>\n    </td></tr>\n  </table>\n  <p>Se você deseja reestabelecer seu acesso ou teve algum problema, entre em contato enviando uma solicitação pela área de suporte do site.</p>\n  <p>Sales Channel agradece.</p>\n</div>"
+      },
+      "id": "email-duplicate-purchase",
+      "name": "Email - Compra Duplicada",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "GPuwtl92ipORGmS6",
+          "name": "SMTP account SalesChannel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at, log_email) VALUES ('{{$node['Montar Objeto do Pedido'].json.order_id}}', '{{$node['Montar Objeto do Pedido'].json.name}}', '{{$node['Montar Objeto do Pedido'].json.email}}', {{$node['Montar Objeto do Pedido'].json.price}}, '{{$node['Montar Objeto do Pedido'].json.payment_status}}', '{{$node['Montar Objeto do Pedido'].json.invite_code}}', '{{$node['Montar Objeto do Pedido'].json.created_at}}', '') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status;",
         "options": {}
       },
       "id": "6d3e6d16-06fc-4454-be09-a2f79a2b65ee",
@@ -292,7 +360,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -80,
+        400,
         -320
       ],
       "credentials": {
@@ -305,7 +373,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT log_email FROM core.orders WHERE order_id = '{{ $json.order_id }}' LIMIT 1;",
+        "query": "SELECT log_email FROM core.orders WHERE order_id = '{{ $node['Montar Objeto do Pedido'].json.order_id }}' LIMIT 1;",
         "options": {}
       },
       "id": "node-check-sent-state",
@@ -313,7 +381,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        150,
+        620,
         -320
       ],
       "credentials": {
@@ -328,47 +396,33 @@
         "conditions": {
           "conditions": [
             {
-              "id": "sent",
-              "leftValue": "={{ $json.log_email }}",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty"
-              }
-            }
-          ]
-        }
-      },
-      "id": "node-if-already-sent",
-      "name": "Já Enviado?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        380,
-        -320
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "conditions": [
-            {
-              "id": "appr",
+              "id": "is-vip-not-sent",
               "leftValue": "={{ $node['Montar Objeto do Pedido'].json.payment_status }}",
               "operator": {
                 "type": "string",
                 "operation": "equals"
               },
               "rightValue": "aprovado"
+            },
+            {
+              "id": "vip-flag",
+              "leftValue": "={{ $json.log_email }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "rightValue": "VIP_ENVIADO"
             }
-          ]
+          ],
+          "combinator": "and"
         }
       },
-      "id": "node-if-approved",
-      "name": "Aprovado?",
+      "id": "node-if-approved-refined",
+      "name": "Enviar VIP?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        600,
+        850,
         -380
       ]
     },
@@ -377,23 +431,32 @@
         "conditions": {
           "conditions": [
             {
-              "id": "pend",
+              "id": "is-pend",
               "leftValue": "={{ $node['Montar Objeto do Pedido'].json.payment_status }}",
               "operator": {
                 "type": "string",
                 "operation": "equals"
               },
               "rightValue": "pendente"
+            },
+            {
+              "id": "not-sent-yet",
+              "leftValue": "={{ $json.log_email }}",
+              "operator": {
+                "type": "string",
+                "operation": "isEmpty"
+              }
             }
-          ]
+          ],
+          "combinator": "and"
         }
       },
-      "id": "node-if-pending",
-      "name": "Pendente?",
+      "id": "node-if-pending-refined",
+      "name": "Enviar Pendente?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        600,
+        850,
         -180
       ]
     },
@@ -403,14 +466,14 @@
         "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
         "subject": "✅ Seu Acesso VIP SellingVideos",
         "emailFormat": "html",
-        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">  <h2>Seu pagamento foi confirmado!</h2>  <p>Para liberar sua entrada automaticamente no canal VIP e ativar seu acesso diário aos vídeos, clique no botão abaixo:</p>  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\"<a>👉</a>    <a href=\"https://t.me/divulgaVovo_bot?start={{ $node['Montar Objeto do Pedido'].json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">Ativar Acesso</a><p>Você será direcionado ao nosso robô do Telegram que irá validar seu pedido e te entregará o link único do canal.</p><p>Qualquer problema entre em contato respondendo este e-mail ou enviando uma solicitação pela área de suporte do site.</p><p>Sales Channel agradece sua compra e deseja muitas vendas em seu canal de afiliado!</p>    </td></tr>  </table></div>"
+        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">  <h2>Seu pagamento foi confirmado!</h2>  <p>Para liberar sua entrada automaticamente no canal VIP e ativar seu acesso diário aos vídeos, clique no botão abaixo:</p>  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\">\n      <a href=\"https://t.me/divulgaVovo_bot?start={{ $node['Montar Objeto do Pedido'].json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">Ativar Acesso</a>\n    </td></tr>\n  </table>\n  <p>Você será direcionado ao nosso robô do Telegram que irá validar seu pedido e te entregará o link único do canal.</p>\n  <p>Qualquer problema entre em contato respondendo este e-mail ou enviando uma solicitação pela área de suporte do site.</p>\n  <p>Sales Channel agradece sua compra e deseja muitas vendas em seu canal de afiliado!</p>\n</div>"
       },
       "id": "efe9bff8-6799-4395-b201-4bf6ecf44974",
       "name": "Email VIP",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        850,
+        1100,
         -420
       ],
       "credentials": {
@@ -426,14 +489,14 @@
         "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
         "subject": "🛒 Pedido Recebido — SellingVideos",
         "emailFormat": "html",
-        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\"><h2>Pedido Recebido!</h2><p>Olá {{ $node['Montar Objeto do Pedido'].json.name }}, recebemos seu pedido e estamos aguardando a confirmação do pagamento.</p>  <p>Assim que for aprovado, você receberá um novo e-mail com o link de acesso ao Telegram VIP.</p></p>  <p>Para pagamentos com Pix ou Cartão a aprovação ocorre de forma muito rápida, então fique atento.</p></p>  <p>Sales Channel agradece.</p></div>"
+        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\"><h2>Pedido Recebido!</h2><p>Olá {{ $node['Montar Objeto do Pedido'].json.name }}, recebemos seu pedido e estamos aguardando a confirmação do pagamento.</p>  <p>Assim que for aprovado, você receberá um novo e-mail com o link de acesso ao Telegram VIP.</p><p>Para pagamentos com Pix ou Cartão a aprovação ocorre de forma muito rápida, então fique atento.</p><p>Sales Channel agradece.</p></div>"
       },
       "id": "node-email-pending",
       "name": "Email Pedido Recebido",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        850,
+        1100,
         -220
       ],
       "credentials": {
@@ -454,7 +517,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        1100,
+        1320,
         -420
       ],
       "credentials": {
@@ -475,7 +538,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        1100,
+        1320,
         -220
       ],
       "credentials": {
@@ -498,7 +561,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        1350,
+        1550,
         -320
       ],
       "credentials": {
@@ -649,6 +712,35 @@
       "main": [
         [
           {
+            "node": "Verificar Compra Existente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Compra Existente": {
+      "main": [
+        [
+          {
+            "node": "Já possui acesso?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Já possui acesso?": {
+      "main": [
+        [
+          {
+            "node": "Email - Compra Duplicada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Gravar Pedido no PostgreSQL",
             "type": "main",
             "index": 0
@@ -671,31 +763,19 @@
       "main": [
         [
           {
-            "node": "Já Enviado?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Já Enviado?": {
-      "main": [
-        null,
-        [
-          {
-            "node": "Aprovado?",
+            "node": "Enviar VIP?",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Pendente?",
+            "node": "Enviar Pendente?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Aprovado?": {
+    "Enviar VIP?": {
       "main": [
         [
           {
@@ -706,7 +786,7 @@
         ]
       ]
     },
-    "Pendente?": {
+    "Enviar Pendente?": {
       "main": [
         [
           {
