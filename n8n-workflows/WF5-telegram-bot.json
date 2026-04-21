@@ -22,7 +22,7 @@
       "position": [470, 300],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const msg = $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id;\n\nlet code = null;\nif (text.startsWith('/start ')) {\n  code = text.split(' ')[1];\n}\n\nreturn [{ json: { code, chat_id: chatId, first_name: msg.from?.first_name || 'Usuário' } }];"
+        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  // Regex robusta para capturar o código após /start (com ou sem espaço)\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{ json: { code, chat_id: chatId, first_name: firstName, raw_text: text } }];"
       }
     },
     {
