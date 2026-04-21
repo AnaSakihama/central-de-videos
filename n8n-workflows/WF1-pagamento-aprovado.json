@@ -171,7 +171,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at) VALUES ('{{$json.order_id}}', '{{$json.name}}', '{{$json.email}}', {{$json.price}}, '{{$json.payment_status}}', '{{$json.invite_code}}', '{{$json.created_at}}') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status;",
+        "query": "INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at, log_email) VALUES ('{{$json.order_id}}', '{{$json.name}}', '{{$json.email}}', {{$json.price}}, '{{$json.payment_status}}', '{{$json.invite_code}}', '{{$json.created_at}}', '') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status;",
         "options": {}
       },
       "id": "6d3e6d16-06fc-4454-be09-a2f79a2b65ee",
@@ -275,10 +275,10 @@
     "Status Aprovado?": { "main": [[{ "node": "Montar Objeto do Pedido", "type": "main", "index": 0 }], [{ "node": "Status Pendente/Processando?", "type": "main", "index": 0 }]] },
     "Status Pendente/Processando?": { "main": [[{ "node": "Montar Objeto do Pedido", "type": "main", "index": 0 }]] },
     "Montar Objeto do Pedido": { "main": [[{ "node": "Gravar Pedido no PostgreSQL", "type": "main", "index": 0 }]] },
-    "Gravar Pedido no PostgreSQL": { "main": [[{ "node": "node-check-sent-state", "type": "main", "index": 0 }]] },
-    "node-check-sent-state": { "main": [[{ "node": "node-if-already-sent", "type": "main", "index": 0 }]] },
-    "node-if-already-sent": { "main": [null, [{ "node": "node-if-approved", "type": "main", "index": 0 }]] },
-    "node-if-approved": { "main": [[{ "node": "Email VIP", "type": "main", "index": 0 }]] },
+    "Gravar Pedido no PostgreSQL": { "main": [[{ "node": "Consultar Estado Envio", "type": "main", "index": 0 }]] },
+    "Consultar Estado Envio": { "main": [[{ "node": "Já Enviado?", "type": "main", "index": 0 }]] },
+    "Já Enviado?": { "main": [null, [{ "node": "Aprovado?", "type": "main", "index": 0 }]] },
+    "Aprovado?": { "main": [[{ "node": "Email VIP", "type": "main", "index": 0 }]] },
     "Email VIP": { "main": [[{ "node": "Marcar VIP", "type": "main", "index": 0 }]] },
     "Marcar VIP": { "main": [[{ "node": "Relatório Admin", "type": "main", "index": 0 }]] }
   },
