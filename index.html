@@ -332,6 +332,15 @@
                 // O n8n pode retornar um array [ { ... } ] ou um objeto direto { ... }
                 const result = Array.isArray(data) ? data[0] : data;
 
+                // Verificação de compra já existente
+                if (result.status === 'already_purchased') {
+                    alert(result.message || 'Identificamos que este e-mail já possui uma compra com pagamento confirmado.');
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.innerHTML = originalText;
+                    return;
+                }
+
                 // Procura pela URL em diferentes campos possíveis
                 const checkoutUrl = result.url || result.init_point || result.sandbox_init_point;
 

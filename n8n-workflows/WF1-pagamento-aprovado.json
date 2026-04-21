@@ -284,11 +284,11 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT order_id, invite_code FROM core.orders WHERE email = '{{ $json.email }}' AND payment_status = 'aprovado' AND order_id != '{{ $json.order_id }}' LIMIT 1;",
+        "query": "INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at, log_email) VALUES ('{{$json.order_id}}', '{{$json.name}}', '{{$json.email}}', {{$json.price}}, '{{$json.payment_status}}', '{{$json.invite_code}}', '{{$json.created_at}}', '') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status;",
         "options": {}
       },
-      "id": "verificar-compra-existente",
-      "name": "Verificar Compra Existente",
+      "id": "6d3e6d16-06fc-4454-be09-a2f79a2b65ee",
+      "name": "Gravar Pedido no PostgreSQL",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
@@ -304,76 +304,8 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "conditions": [
-            {
-              "id": "has-access",
-              "leftValue": "={{ $json.order_id }}",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty"
-              }
-            }
-          ]
-        }
-      },
-      "id": "if-already-has-access",
-      "name": "Já possui acesso?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        150,
-        -120
-      ]
-    },
-    {
-      "parameters": {
-        "fromEmail": "saleschannel.admin@gmail.com",
-        "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
-        "subject": "⚠️ Aviso: Você já possui acesso VIP!",
-        "emailFormat": "html",
-        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">\n  <h2>Você já possui acesso!</h2>\n  <p>Verificamos que você já possui uma compra aprovada em nosso sistema com este e-mail.</p>\n  <p>Seu código de acesso original é: <b>{{ $json.invite_code }}</b></p>\n  <p>Para entrar no canal VIP agora, clique abaixo:</p>\n  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">\n    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\">\n      <a href=\"https://t.me/divulgaVovo_bot?start={{ $json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">👉 Reativar Acesso</a>\n    </td></tr>\n  </table>\n  <p>Se você deseja reestabelecer seu acesso ou teve algum problema, entre em contato enviando uma solicitação pela área de suporte do site.</p>\n  <p>Sales Channel agradece.</p>\n</div>"
-      },
-      "id": "email-duplicate-purchase",
-      "name": "Email - Compra Duplicada",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2,
-      "position": [
-        400,
-        0
-      ],
-      "credentials": {
-        "smtp": {
-          "id": "GPuwtl92ipORGmS6",
-          "name": "SMTP account SalesChannel"
-        }
-      }
-    },
-    {
-      "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at, log_email) VALUES ('{{$node['Montar Objeto do Pedido'].json.order_id}}', '{{$node['Montar Objeto do Pedido'].json.name}}', '{{$node['Montar Objeto do Pedido'].json.email}}', {{$node['Montar Objeto do Pedido'].json.price}}, '{{$node['Montar Objeto do Pedido'].json.payment_status}}', '{{$node['Montar Objeto do Pedido'].json.invite_code}}', '{{$node['Montar Objeto do Pedido'].json.created_at}}', '') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status;",
-        "options": {}
-      },
-      "id": "6d3e6d16-06fc-4454-be09-a2f79a2b65ee",
-      "name": "Gravar Pedido no PostgreSQL",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2,
-      "position": [
-        400,
-        -320
-      ],
-      "credentials": {
-        "postgres": {
-          "id": "PPEXcNJ5kjQ8UbuR",
-          "name": "PostgresSalesChannel"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT log_email FROM core.orders WHERE order_id = '{{ $node['Montar Objeto do Pedido'].json.order_id }}' LIMIT 1;",
+        "query": "SELECT log_email FROM core.orders WHERE order_id = '{{ $json.order_id }}' LIMIT 1;",
         "options": {}
       },
       "id": "node-check-sent-state",
@@ -381,8 +313,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        620,
-        -320
+        150,
+        -120
       ],
       "credentials": {
         "postgres": {
@@ -422,8 +354,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        850,
-        -380
+        400,
+        -200
       ]
     },
     {
@@ -456,8 +388,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        850,
-        -180
+        400,
+        40
       ]
     },
     {
@@ -473,8 +405,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        1100,
-        -420
+        650,
+        -220
       ],
       "credentials": {
         "smtp": {
@@ -496,8 +428,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        1100,
-        -220
+        650,
+        20
       ],
       "credentials": {
         "smtp": {
@@ -517,8 +449,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        1320,
-        -420
+        870,
+        -220
       ],
       "credentials": {
         "postgres": {
@@ -538,8 +470,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        1320,
-        -220
+        870,
+        20
       ],
       "credentials": {
         "postgres": {
@@ -561,8 +493,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        1550,
-        -320
+        1100,
+        -100
       ],
       "credentials": {
         "smtp": {
@@ -710,35 +642,6 @@
     },
     "Montar Objeto do Pedido": {
       "main": [
-        [
-          {
-            "node": "Verificar Compra Existente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Verificar Compra Existente": {
-      "main": [
-        [
-          {
-            "node": "Já possui acesso?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Já possui acesso?": {
-      "main": [
-        [
-          {
-            "node": "Email - Compra Duplicada",
-            "type": "main",
-            "index": 0
-          }
-        ],
         [
           {
             "node": "Gravar Pedido no PostgreSQL",
