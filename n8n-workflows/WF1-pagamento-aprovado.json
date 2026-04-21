@@ -216,7 +216,19 @@
       "name": "Aprovado?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [ 600, -320 ]
+      "position": [ 600, -380 ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [{ "id": "pend", "leftValue": "={{ $node['Montar Objeto do Pedido'].json.payment_status }}", "operator": { "type": "string", "operation": "equals" }, "rightValue": "pendente" }]
+        }
+      },
+      "id": "node-if-pending",
+      "name": "Pendente?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [ 600, -180 ]
     },
     {
       "parameters": {
@@ -230,7 +242,22 @@
       "name": "Email VIP",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [ 850, -400 ],
+      "position": [ 850, -420 ],
+      "credentials": { "smtp": { "id": "GPuwtl92ipORGmS6", "name": "SMTP account SalesChannel" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "saleschannel.admin@gmail.com",
+        "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
+        "subject": "🛒 Pedido Recebido — SellingVideos",
+        "emailFormat": "html",
+        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">\n  <h2>Pedido Recebido!</h2>\n  <p>Olá {{ $node['Montar Objeto do Pedido'].json.name }}, recebemos seu pedido e estamos aguardando a confirmação do pagamento.</p>\n  <p>Assim que for aprovado, você receberá um novo e-mail com o link de acesso ao Telegram VIP.</p>\n</div>"
+      },
+      "id": "node-email-pending",
+      "name": "Email Pedido Recebido",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [ 850, -220 ],
       "credentials": { "smtp": { "id": "GPuwtl92ipORGmS6", "name": "SMTP account SalesChannel" } }
     },
     {
@@ -243,22 +270,35 @@
       "name": "Marcar VIP",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
-      "position": [ 1100, -400 ],
+      "position": [ 1100, -420 ],
+      "credentials": { "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSalesChannel" } }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE core.orders SET log_email = 'PENDENTE_ENVIADO' WHERE order_id = '{{ $node['Montar Objeto do Pedido'].json.order_id }}';",
+        "options": {}
+      },
+      "id": "node-mark-pending",
+      "name": "Marcar Pendente",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [ 1100, -220 ],
       "credentials": { "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSalesChannel" } }
     },
     {
       "parameters": {
         "fromEmail": "saleschannel.admin@gmail.com",
         "toEmail": "admin@saleschannel.com.br",
-        "subject": "🛒 Venda em Processamento",
+        "subject": "🛒 Venda SellingVideos",
         "emailType": "html",
-        "message": "Relatório de venda em processamento no Mercado Pago."
+        "message": "Relatório de venda SellingVideos."
       },
       "id": "a3ad21d0-497b-4aba-ae78-bdc2ee4fa68d",
       "name": "Relatório Admin",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [ 1350, -250 ],
+      "position": [ 1350, -320 ],
       "credentials": { "smtp": { "id": "GPuwtl92ipORGmS6", "name": "SMTP account SalesChannel" } }
     }
   ],
@@ -277,10 +317,13 @@
     "Montar Objeto do Pedido": { "main": [[{ "node": "Gravar Pedido no PostgreSQL", "type": "main", "index": 0 }]] },
     "Gravar Pedido no PostgreSQL": { "main": [[{ "node": "Consultar Estado Envio", "type": "main", "index": 0 }]] },
     "Consultar Estado Envio": { "main": [[{ "node": "Já Enviado?", "type": "main", "index": 0 }]] },
-    "Já Enviado?": { "main": [null, [{ "node": "Aprovado?", "type": "main", "index": 0 }]] },
+    "Já Enviado?": { "main": [null, [{ "node": "Aprovado?", "type": "main", "index": 0 }, { "node": "Pendente?", "type": "main", "index": 0 }]] },
     "Aprovado?": { "main": [[{ "node": "Email VIP", "type": "main", "index": 0 }]] },
+    "Pendente?": { "main": [[{ "node": "Email Pedido Recebido", "type": "main", "index": 0 }]] },
     "Email VIP": { "main": [[{ "node": "Marcar VIP", "type": "main", "index": 0 }]] },
-    "Marcar VIP": { "main": [[{ "node": "Relatório Admin", "type": "main", "index": 0 }]] }
+    "Email Pedido Recebido": { "main": [[{ "node": "Marcar Pendente", "type": "main", "index": 0 }]] },
+    "Marcar VIP": { "main": [[{ "node": "Relatório Admin", "type": "main", "index": 0 }]] },
+    "Marcar Pendente": { "main": [[{ "node": "Relatório Admin", "type": "main", "index": 0 }]] }
   },
   "active": true,
   "settings": { "executionOrder": "v1" }
