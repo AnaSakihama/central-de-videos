@@ -98,7 +98,8 @@
           "parameters": [
             { "name": "chat_id", "value": "={{ $('Extrair Código /start').item.json.chat_id }}" },
             { "name": "text", "value": "=✅ Olá {{ $('Extrair Código /start').item.json.first_name }}! Seu acesso VIP foi validado.\n\nClique no link abaixo para entrar no canal:\n{{ $json.result.invite_link }}\n\n⚠️ Este link expira em 4 horas e só pode ser usado uma vez." },
-            { "name": "parse_mode", "value": "HTML" }
+            { "name": "parse_mode", "value": "HTML" },
+            { "name": "link_preview_options", "value": "{\"is_disabled\": true}" }
           ]
         }
       }
