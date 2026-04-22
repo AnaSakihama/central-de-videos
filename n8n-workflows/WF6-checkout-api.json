@@ -20,7 +20,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT order_id FROM core.orders WHERE email = '{{ $node[\"Webhook Checkout\"].json.query?.email }}' AND payment_status = 'aprovado' LIMIT 1;",
+        "query": "SELECT order_id FROM core.orders WHERE email = '{{ $node[\"Webhook Checkout\"].json.query?.email }}' AND payment_status ILIKE 'aprovado%' LIMIT 1;",
         "options": {}
       },
       "id": "d299efa8-59a0-4f95-8e5d-f9f369237d46",
