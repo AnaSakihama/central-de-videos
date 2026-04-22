@@ -77,7 +77,7 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "chat_id", "value": "COLE_AQUI_O_CHAT_ID_DO_CANAL" },
+            { "name": "chat_id", "value": "-1003846840774" },
             { "name": "member_limit", "value": 1 },
             { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 300 }}" }
           ]
