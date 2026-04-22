@@ -2,73 +2,110 @@
   "name": "WF4 — Formulário de Suporte",
   "nodes": [
     {
-      "id": "node-webhook-suporte",
-      "name": "Receber Formulário de Suporte",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [250, 300],
       "parameters": {
         "httpMethod": "POST",
         "path": "suporte",
         "responseMode": "responseNode",
         "options": {}
-      }
+      },
+      "id": "e94bf2d8-acbf-440e-b9f3-82e553928d8e",
+      "name": "Receber Formulário de Suporte",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        -64
+      ],
+      "webhookId": "2351a187-5a10-47e4-84bd-d429b2e15b53"
     },
     {
-      "id": "node-email-suporte",
-      "name": "Enviar E-mail para Admin",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2,
-      "position": [500, 300],
       "parameters": {
-        "fromEmail": "COLE_SEU_EMAIL_AQUI@gmail.com",
+        "fromEmail": "saleschannel.admin@gmail.com",
         "toEmail": "admin@saleschannel.com.br",
         "subject": "=🎫 [Suporte] {{ $json.body.titulo }} — de {{ $json.body.nome }}",
         "emailFormat": "html",
-        "html": "=<div style=\"font-family:Inter,Arial,sans-serif;max-width:640px;margin:0 auto\">\n  <div style=\"background:linear-gradient(135deg,#6c63ff,#a78bfa);padding:24px 32px;border-radius:12px 12px 0 0\">\n    <h2 style=\"color:#fff;margin:0;font-size:20px\">🎫 Nova Solicitação de Suporte</h2>\n  </div>\n  <div style=\"background:#fff;border:1px solid #e2e8f0;border-top:none;padding:28px 32px;border-radius:0 0 12px 12px\">\n    <table style=\"width:100%;border-collapse:collapse\">\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px;width:130px\">👤 Nome</td><td style=\"padding:8px 0;font-weight:600;color:#1a1a2e\">{{ $json.body.nome }}</td></tr>\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px\">📧 E-mail</td><td style=\"padding:8px 0;font-weight:600;color:#1a1a2e\">{{ $json.body.email }}</td></tr>\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px\">📱 Telefone</td><td style=\"padding:8px 0;color:#1a1a2e\">{{ $json.body.telefone || '—' }}</td></tr>\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px\">📱 Título</td><td style=\"padding:8px 0;font-weight:700;color:#6c63ff;font-size:16px\">{{ $json.body.titulo }}</td></tr>\n    </table>\n    <hr style=\"margin:20px 0;border:none;border-top:1px solid #eee\">\n    <p style=\"color:#666;font-size:13px;margin-bottom:8px\">📝 Descrição:</p>\n    <div style=\"background:#f8f9ff;border-left:4px solid #6c63ff;padding:16px;border-radius:0 8px 8px 0;color:#333;line-height:1.7\">\n      {{ $json.body.descricao }}\n    </div>\n    {{ $json.body.imagens && $json.body.imagens.length > 0 ? '<hr style=\"margin:20px 0;border:none;border-top:1px solid #eee\"><p style=\"color:#666;font-size:13px;margin-bottom:12px\">🖼️ Imagens anexadas:</p>' + $json.body.imagens.map(img => '<div style=\"margin-bottom:12px\"><p style=\"font-size:12px;color:#888;margin:0 0 6px\">' + img.nome + '</p><img src=\"' + img.dados + '\" style=\"max-width:100%;border-radius:8px;border:1px solid #e2e8f0\" /></div>').join('') : '' }}\n    <hr style=\"margin:20px 0;border:none;border-top:1px solid #eee\">\n    <p style=\"font-size:12px;color:#aaa\">Enviado automaticamente via formulário de suporte do SellingVideos</p>\n  </div>\n</div>",
+        "html": "=<div style=\"font-family:Inter,Arial,sans-serif;max-width:640px;margin:0 auto\">\n  <div style=\"background:linear-gradient(135deg,#6c63ff,#a78bfa);padding:24px 32px;border-radius:12px 12px 0 0\">\n    <h2 style=\"color:#fff;margin:0;font-size:20px\">🎫 Nova Solicitação de Suporte</h2>\n  </div>\n  <div style=\"background:#fff;border:1px solid #e2e8f0;border-top:none;padding:28px 32px;border-radius:0 0 12px 12px\">\n    <table style=\"width:100%;border-collapse:collapse\">\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px;width:130px\">👤 Nome</td><td style=\"padding:8px 0;font-weight:600;color:#1a1a2e\">{{ $json.body.nome }}</td></tr>\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px\">📧 E-mail</td><td style=\"padding:8px 0;font-weight:600;color:#1a1a2e\">{{ $json.body.email }}</td></tr>\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px\">📱 Telefone</td><td style=\"padding:8px 0;color:#1a1a2e\">{{ $json.body.telefone || '—' }}</td></tr>\n      <tr><td style=\"padding:8px 0;color:#666;font-size:14px\">📱 Título</td><td style=\"padding:8px 0;font-weight:700;color:#6c63ff;font-size:16px\">{{ $json.body.titulo }}</td></tr>\n    </table>\n    <hr style=\"margin:20px 0;border:none;border-top:1px solid #eee\">\n    <p style=\"color:#666;font-size:13px;margin-bottom:8px\">📝 Descrição:</p>\n    <div style=\"background:#f8f9ff;border-left:4px solid #6c63ff;padding:16px;border-radius:0 8px 8px 0;color:#333;line-height:1.7\">\n      {{ $json.body.descricao }}\n    </div>\n    {{ $json.body.imagens && $json.body.imagens.length > 0 ? '<hr style=\"margin:20px 0;border:none;border-top:1px solid #eee\"><p style=\"color:#666;font-size:13px;margin-bottom:12px\">🖼️ Imagens anexadas:</p>' + $json.body.imagens.map(img => '<div style=\"margin-bottom:12px\"><p style=\"font-size:12px;color:#888;margin:0 0 6px\">' + img.nome + '</p><img src=\"' + img.dados + '\" style=\"max-width:100%;border-radius:8px;border:1px solid #e2e8f0\" /></div>').join('') : '' }}\n    <hr style=\"margin:20px 0;border:none;border-top:1px solid #eee\">\n    <p style=\"font-size:12px;color:#aaa\">Enviado automaticamente via formulário de suporte do Sales Channel</p>\n  </div>\n</div>",
         "options": {}
       },
+      "id": "f4e6b0b6-39c8-4bca-a4c1-b1956c33b6cf",
+      "name": "Enviar E-mail para Admin",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -64
+      ],
+      "webhookId": "328d42ed-03aa-4aff-b778-2e708dd352f6",
       "credentials": {
         "smtp": {
-          "id": "3",
-          "name": "Gmail SMTP - SalesChannel"
+          "id": "GPuwtl92ipORGmS6",
+          "name": "SMTP account SalesChannel"
         }
       }
     },
     {
-      "id": "node-respond-ok",
-      "name": "Resposta - Sucesso",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [750, 300],
       "parameters": {
         "options": {
           "responseCode": 200,
-          "responseData": "{\"success\":true,\"message\":\"Solicitação recebida com sucesso!\"}",
           "responseHeaders": {
             "entries": [
-              {"name": "Content-Type", "value": "application/json"},
-              {"name": "Access-Control-Allow-Origin", "value": "*"}
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
             ]
           }
         }
-      }
+      },
+      "id": "b2ee8533-00a8-4587-8279-9c069b2cdf94",
+      "name": "Resposta - Sucesso",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -64
+      ]
     }
   ],
+  "pinData": {},
   "connections": {
     "Receber Formulário de Suporte": {
-      "main": [[{"node": "Enviar E-mail para Admin", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Enviar E-mail para Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Enviar E-mail para Admin": {
-      "main": [[{"node": "Resposta - Sucesso", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Resposta - Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
+  "active": true,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "staticData": null,
+  "versionId": "96f16f5a-9b9a-4302-9e46-581d60342605",
   "meta": {
-    "templateCredsSetupCompleted": false
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ece93edd8024eed03540d94f583084d91abce2d625f29e58c55c2eb2583682"
   },
-  "tags": ["sellingvideos"]
+  "id": "3v3a9oGdu1EAJ8rp",
+  "tags": []
 }

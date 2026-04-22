@@ -2,180 +2,373 @@
   "name": "WF5 — Telegram Bot (Libera Acesso)",
   "nodes": [
     {
-      "id": "node-webhook-tg",
-      "name": "Webhook Telegram",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [250, 300],
       "parameters": {
         "httpMethod": "POST",
         "path": "telegram-bot",
-        "responseMode": "onReceived",
         "options": {}
-      }
+      },
+      "id": "5b0ce06f-9342-40bd-b275-7c6b6532ccab",
+      "name": "Webhook Telegram",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2944,
+        -192
+      ],
+      "webhookId": "b4b37e98-9f72-4a8b-8b25-356b1ba00447"
     },
     {
-      "id": "node-extract-code",
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  // Regex robusta para capturar o código após /start\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{ json: { code, chat_id: chatId, first_name: firstName, raw_text: text } }];"
+      },
+      "id": "61848b00-daed-499b-b087-29e0d44e9d7c",
       "name": "Extrair Código /start",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [470, 300],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  // Regex robusta para capturar o código após /start\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{ json: { code, chat_id: chatId, first_name: firstName, raw_text: text } }];"
-      }
+      "position": [
+        -2720,
+        -192
+      ]
     },
     {
-      "id": "node-check-code",
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-code",
+              "leftValue": "={{ $json.code }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6d9d9dad-fffc-44fc-91c0-d4b1b788c914",
       "name": "Tem código?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [690, 300],
-      "parameters": {
-        "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
-          "conditions": [{ "id": "cond-code", "leftValue": "={{ $json.code }}", "operator": { "type": "string", "operation": "notEmpty" } }]
-        }
-      }
+      "position": [
+        -2496,
+        -192
+      ]
     },
     {
-      "id": "node-pg-lookup",
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT order_id, name, email FROM core.orders WHERE invite_code = '{{ $json.code }}' AND code_used_at IS NULL LIMIT 1;",
+        "options": {}
+      },
+      "id": "4e07d1bb-9dce-432d-b4b2-626048e838a5",
       "name": "Validar Código no DB",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
-      "position": [910, 200],
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT order_id, name, email FROM core.orders WHERE invite_code = '{{ $json.code }}' AND code_used_at IS NULL LIMIT 1;"
-      },
+      "position": [
+        -2288,
+        -288
+      ],
       "credentials": {
-        "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
-      }
-    },
-    {
-      "id": "node-check-valid",
-      "name": "Código Válido?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [1130, 200],
-      "parameters": {
-        "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
-          "conditions": [{ "id": "cond-valid", "leftValue": "={{ $json.order_id }}", "operator": { "type": "string", "operation": "notEmpty" } }]
+        "postgres": {
+          "id": "JAKg7UeoJtM66d5M",
+          "name": "PostgresSellingVideos"
         }
       }
     },
     {
-      "id": "node-tg-generate-link",
-      "name": "Gerar Link Temporário",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
-      "position": [1350, 150],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-valid",
+              "leftValue": "={{ $json.order_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "799dbe3e-93d6-4e4e-ac50-ff206e802b8e",
+      "name": "Código Válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -2064,
+        -288
+      ]
+    },
+    {
       "parameters": {
         "method": "POST",
         "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/createChatInviteLink",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "chat_id", "value": "-1003846840774" },
-            { "name": "member_limit", "value": 1 },
-            { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 14400 }}" }
+            {
+              "name": "chat_id",
+              "value": "-1003846840774"
+            },
+            {
+              "name": "member_limit",
+              "value": 1
+            },
+            {
+              "name": "expire_date",
+              "value": "={{ Math.floor(Date.now()/1000) + 14400 }}"
+            }
           ]
-        }
-      }
+        },
+        "options": {}
+      },
+      "id": "f8dcd599-32a8-4d77-a7fa-a37afabc2f84",
+      "name": "Gerar Link Temporário",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1840,
+        -336
+      ]
     },
     {
-      "id": "node-tg-send-link",
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/sendMessage",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $('Extrair Código /start').item.json.chat_id }}"
+            },
+            {
+              "name": "text",
+              "value": "=✅ Olá {{ $('Extrair Código /start').item.json.first_name }}! Seu acesso VIP foi validado.\n\nClique no link abaixo para entrar no canal:\n{{ $json.result.invite_link }}\n\n⚠️ Este link expira em 4 horas e só pode ser usado uma vez."
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            },
+            {
+              "name": "link_preview_options",
+              "value": "{\"is_disabled\": true}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e7790b05-da70-4d84-84d7-830dcb99331a",
       "name": "Enviar Link ao Usuário",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [1570, 150],
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/sendMessage",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            { "name": "chat_id", "value": "={{ $('Extrair Código /start').item.json.chat_id }}" },
-            { "name": "text", "value": "=✅ Olá {{ $('Extrair Código /start').item.json.first_name }}! Seu acesso VIP foi validado.\n\nClique no link abaixo para entrar no canal:\n{{ $json.result.invite_link }}\n\n⚠️ Este link expira em 4 horas e só pode ser usado uma vez." },
-            { "name": "parse_mode", "value": "HTML" },
-            { "name": "link_preview_options", "value": "{\"is_disabled\": true}" }
-          ]
-        }
-      }
+      "position": [
+        -1616,
+        -336
+      ]
     },
     {
-      "id": "node-pg-mark-used",
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE invite_code = '{{ $('Extrair Código /start').item.json.code }}';",
+        "options": {}
+      },
+      "id": "40320d78-7453-4876-8dd9-5b7b1dc271aa",
       "name": "Marcar como Usado",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
-      "position": [1790, 150],
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE invite_code = '{{ $('Extrair Código /start').item.json.code }}';"
-      },
+      "position": [
+        -1408,
+        -336
+      ],
       "credentials": {
-        "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
+        "postgres": {
+          "id": "JAKg7UeoJtM66d5M",
+          "name": "PostgresSellingVideos"
+        }
       }
     },
     {
-      "id": "node-tg-invalid-code",
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/sendMessage",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $node['Extrair Código /start'].json.chat_id }}"
+            },
+            {
+              "name": "text",
+              "value": "❌ <b>Código Inválido ou Já Utilizado.</b>\n\nPor favor, verifique se você copiou o código corretamente do seu e-mail de acesso. Se o problema persistir, entre em contato com o suporte."
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7ca08b6e-c132-4ef6-a8d3-239c7e05fc10",
       "name": "Erro - Código Inválido",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [1350, 300],
+      "position": [
+        -1840,
+        -192
+      ]
+    },
+    {
       "parameters": {
         "method": "POST",
         "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/sendMessage",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "chat_id", "value": "={{ $node['Extrair Código /start'].json.chat_id }}" },
-            { "name": "text", "value": "❌ <b>Código Inválido ou Já Utilizado.</b>\n\nPor favor, verifique se você copiou o código corretamente do seu e-mail de acesso. Se o problema persistir, entre em contato com o suporte." },
-            { "name": "parse_mode", "value": "HTML" }
+            {
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}"
+            },
+            {
+              "name": "text",
+              "value": "👋 Olá! Este bot é utilizado para liberar acesso VIP ao Sales Channel.\n\nSe você já adquiriu seu acesso, clique no link enviado no seu e-mail.\n\nSe ainda não adquiriu, acesse: https://saleschannel.com.br/sellingvideos"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
           ]
-        }
-      }
-    },
-    {
-      "id": "node-tg-no-code",
+        },
+        "options": {}
+      },
+      "id": "deaa0854-5e0e-4ae2-821c-936c98bb1534",
       "name": "Erro - Sem Código",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [910, 420],
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/sendMessage",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            { "name": "chat_id", "value": "={{ $json.chat_id }}" },
-            { "name": "text", "value": "👋 Olá! Este bot é utilizado para liberar acesso VIP ao SellingVideos.\n\nSe você já adquiriu seu acesso, clique no link enviado no seu e-mail.\n\nSe ainda não adquiriu, acesse: https://saleschannel.com.br/sellingvideos" },
-            { "name": "parse_mode", "value": "HTML" }
-          ]
-        }
-      }
+      "position": [
+        -2288,
+        -64
+      ]
     }
   ],
+  "pinData": {},
   "connections": {
-    "Webhook Telegram": { "main": [[{ "node": "Extrair Código /start", "type": "main", "index": 0 }]] },
-    "Extrair Código /start": { "main": [[{ "node": "Tem código?", "type": "main", "index": 0 }]] },
+    "Webhook Telegram": {
+      "main": [
+        [
+          {
+            "node": "Extrair Código /start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Código /start": {
+      "main": [
+        [
+          {
+            "node": "Tem código?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Tem código?": {
       "main": [
-        [{ "node": "Validar Código no DB", "type": "main", "index": 0 }],
-        [{ "node": "Erro - Sem Código", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Validar Código no DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Erro - Sem Código",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Validar Código no DB": { "main": [[{ "node": "Código Válido?", "type": "main", "index": 0 }]] },
+    "Validar Código no DB": {
+      "main": [
+        [
+          {
+            "node": "Código Válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Código Válido?": {
       "main": [
-        [{ "node": "Gerar Link Temporário", "type": "main", "index": 0 }],
-        [{ "node": "Erro - Código Inválido", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Gerar Link Temporário",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Erro - Código Inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Gerar Link Temporário": { "main": [[{ "node": "Enviar Link ao Usuário", "type": "main", "index": 0 }]] },
-    "Enviar Link ao Usuário": { "main": [[{ "node": "Marcar como Usado", "type": "main", "index": 0 }]] }
+    "Gerar Link Temporário": {
+      "main": [
+        [
+          {
+            "node": "Enviar Link ao Usuário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Link ao Usuário": {
+      "main": [
+        [
+          {
+            "node": "Marcar como Usado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" },
-  "tags": ["sellingvideos"]
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "36c62fc6-74bf-4e7b-92ce-94931528ab5d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ece93edd8024eed03540d94f583084d91abce2d625f29e58c55c2eb2583682"
+  },
+  "id": "MfMXHitGl7CjfZ7m",
+  "tags": []
 }
