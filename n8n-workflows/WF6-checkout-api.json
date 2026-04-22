@@ -34,7 +34,7 @@
       "credentials": {
         "postgres": {
           "id": "PPEXcNJ5kjQ8UbuR",
-          "name": "PostgresSalesChannel"
+          "name": "PostgresSellingVideos"
         }
       }
     },
@@ -79,9 +79,10 @@
         200
       ],
       "parameters": {
+        "respondWith": "text",
+        "responseBody": "={\n  \"status\": \"already_purchased\",\n  \"message\": \"Identificamos que este e-mail já possui uma compra com pagamento confirmado. Para reestabelecer seu acesso, utilize o formulário de suporte.\"\n}",
         "options": {
           "responseCode": 200,
-          "responseData": "={\n  \"status\": \"already_purchased\",\n  \"message\": \"Identificamos que este e-mail já possui uma compra com pagamento confirmado. Para reestabelecer seu acesso, utilize o formulário de suporte.\"\n}",
           "responseHeaders": {
             "entries": [
               {
@@ -125,7 +126,7 @@
           "parameters": []
         },
         "specifyBody": "json",
-        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício SellingVideos VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node[\\\"Webhook Checkout\\\"].json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node[\\\"Webhook Checkout\\\"].json.query?.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
+        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício SellingVideos VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
         "options": {}
       },
       "credentials": {
@@ -145,9 +146,10 @@
         400
       ],
       "parameters": {
+        "respondWith": "text",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"url\": \"{{ $json.init_point }}\",\n  \"id\": \"{{ $json.id }}\"\n}",
         "options": {
           "responseCode": 200,
-          "responseData": "={\n  \"status\": \"success\",\n  \"url\": \"{{ $json.init_point }}\",\n  \"id\": \"{{ $json.id }}\"\n}",
           "responseHeaders": {
             "entries": [
               {
