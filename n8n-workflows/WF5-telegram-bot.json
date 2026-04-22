@@ -79,7 +79,7 @@
           "parameters": [
             { "name": "chat_id", "value": "-1003846840774" },
             { "name": "member_limit", "value": 1 },
-            { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 43200 }}" }
+            { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 14400 }}" }
           ]
         }
       }
@@ -97,7 +97,7 @@
         "bodyParameters": {
           "parameters": [
             { "name": "chat_id", "value": "={{ $('Extrair Código /start').item.json.chat_id }}" },
-            { "name": "text", "value": "=✅ Olá {{ $('Extrair Código /start').item.json.first_name }}! Seu acesso VIP foi validado.\n\nClique no link abaixo para entrar no canal:\n{{ $json.result.invite_link }}\n\n⚠️ Este link expira em 5 minutos e só pode ser usado uma vez." },
+            { "name": "text", "value": "=✅ Olá {{ $('Extrair Código /start').item.json.first_name }}! Seu acesso VIP foi validado.\n\nClique no link abaixo para entrar no canal:\n{{ $json.result.invite_link }}\n\n⚠️ Este link expira em 4 horas e só pode ser usado uma vez." },
             { "name": "parse_mode", "value": "HTML" }
           ]
         }
