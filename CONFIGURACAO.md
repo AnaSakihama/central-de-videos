@@ -35,7 +35,7 @@ docker exec -i saleschannel_postgres psql -U sellingvideos_user -d sellingvideos
 
 | Credencial | Tipo | Configuração |
 |---|---|---|
-| **PostgreSQL - SalesChannel** | `PostgreSQL` | Host: `saleschannel_postgres`, User: `sellingvideos_user`, DB: `sellingvideos_db` |
+| **PostgresSellingVideos** | `PostgreSQL` | Host: `saleschannel_postgres`, User: `sellingvideos_user`, DB: `sellingvideos_db` |
 | **Mercado Pago - Access Token**| `Header Auth` | Name: `Authorization`, Value: `Bearer APP_USR-...` |
 | **Gmail SMTP - SalesChannel** | `SMTP` | Host: `smtp.gmail.com`, Port: `465` (SSL), User: `seu-gmail`, Password: `Senha de App` |
 
