@@ -1,20 +1,31 @@
 {
-  "name": "WF3 — Admin API (Ultra Compatible)",
+  "name": "WF3 — Admin API (Nova Versão)",
   "nodes": [
     {
+      "id": "node-webhook-admin",
+      "name": "Webhook Admin",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        250,
+        300
+      ],
       "parameters": {
         "httpMethod": "POST",
         "path": "admin",
         "responseMode": "responseNode",
         "options": {}
-      },
-      "id": "782dc470-7ad3-40e8-9969-68818a408caf",
-      "name": "Webhook Admin",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [250, 300]
+      }
     },
     {
+      "id": "node-check-auth",
+      "name": "Verificar Admin Key",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        470,
+        300
+      ],
       "parameters": {
         "conditions": {
           "options": {
@@ -35,73 +46,91 @@
           ],
           "combinator": "and"
         }
-      },
-      "id": "44accb8b-2490-4180-bca0-f692937a4086",
-      "name": "Verificar Admin Key",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [470, 300]
+      }
     },
     {
+      "id": "node-is-list-route",
+      "name": "É Listagem?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        690,
+        250
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-list",
+              "leftValue": "={{ $json.body?.action || 'listar_pedidos' }}",
+              "rightValue": "listar_pedidos",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "node-respond-unauthorized",
+      "name": "Resposta - Não Autorizado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        690,
+        450
+      ],
       "parameters": {
         "options": {
           "responseCode": 401,
           "responseData": "{\"error\":\"Unauthorized\"}",
           "responseHeaders": {
-            "entries": [{"name": "Content-Type", "value": "application/json"}]
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
           }
         }
-      },
-      "id": "ce1fdb1c-7d20-4f4a-96f7-e2674f15ea7f",
-      "name": "Resposta - Não Autorizado",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [690, 420]
+      }
     },
     {
-      "parameters": {
-        "dataType": "string",
-        "value": "={{ $json.body?.action || 'listar_pedidos' }}",
-        "rules": {
-          "rules": [
-            {
-              "value": "listar_pedidos"
-            },
-            {
-              "value": "atualizar_status",
-              "output": 1
-            }
-          ]
-        }
-      },
-      "id": "8890de84-f2f0-4c57-b34f-3d93b3f3d7d5",
-      "name": "Roteador de Rotas",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 1,
-      "position": [690, 250]
-    },
-    {
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "// Proteção contra entrada indefinida\nconst items = $input.all();\nif (!items || items.length === 0) return [];\n\nconst body  = items[0].json.body  || {};\nconst query = items[0].json.query || {};\n\nconst search        = (query.search          || body.search          || '').toString().toLowerCase();\nconst paymentStatus = (query.payment_status  || body.payment_status  || '').toString().toLowerCase();\nconst orderStatus   = (query.order_status    || body.order_status    || '').toString().toLowerCase();\n\nconst conditions = [];\nconst params     = [];\n\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\n\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql   = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\n\nreturn [{ json: { sql, params } }];"
-      },
-      "id": "c70db735-0989-4d77-81da-6ce0177eac00",
+      "id": "node-code-build-query",
       "name": "Montar Query de Listagem",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [910, 180]
+      "position": [
+        910,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nif (!items || items.length === 0) return [];\nconst body = items[0].json.body || {};\nconst query = items[0].json.query || {};\nconst search = (query.search || body.search || '').toString().toLowerCase();\nconst paymentStatus = (query.payment_status || body.payment_status || '').toString().toLowerCase();\nconst orderStatus = (query.order_status || body.order_status || '').toString().toLowerCase();\nconst conditions = [];\nconst params = [];\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\nreturn [{ json: { sql, params } }];"
+      }
     },
     {
+      "id": "node-pg-list",
+      "name": "Consultar Pedidos PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1130,
+        180
+      ],
       "parameters": {
         "operation": "executeQuery",
         "query": "={{ $json.sql }}",
         "additionalFields": {}
       },
-      "id": "8d2416d3-4d3d-4c89-90f9-631b2b78df11",
-      "name": "Consultar Pedidos PostgreSQL",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2,
-      "position": [1130, 180],
       "credentials": {
         "postgres": {
           "id": "PPEXcNJ5kjQ8UbuR",
@@ -110,45 +139,60 @@
       }
     },
     {
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const orders = $input.all().map(i => i.json);\nreturn [{ json: { orders, total: orders.length } }];"
-      },
-      "id": "78fcb34c-74f7-4420-9200-27fb3a6b68bb",
+      "id": "node-serialize-response",
       "name": "Serializar Resposta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1350, 180]
+      "position": [
+        1350,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const orders = $input.all().map(i => i.json);\nreturn [{ json: { orders, total: orders.length } }];"
+      }
     },
     {
+      "id": "node-respond-list",
+      "name": "Resposta - Lista de Pedidos",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1570,
+        180
+      ],
       "parameters": {
         "options": {
           "responseCode": 200,
           "responseData": "={{ JSON.stringify($json) }}",
           "responseHeaders": {
             "entries": [
-              {"name": "Content-Type", "value": "application/json"},
-              {"name": "Access-Control-Allow-Origin", "value": "*"}
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
             ]
           }
         }
-      },
-      "id": "b41263cc-4aaa-4a67-9715-8f7fd51f2953",
-      "name": "Resposta - Lista de Pedidos",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [1570, 180]
+      }
     },
     {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "UPDATE core.orders\nSET\n  order_status = '{{ $('Webhook Admin').item.json.body.order_status }}',\n  approved_at  = CASE\n    WHEN '{{ $('Webhook Admin').item.json.body.approved_at }}' <> ''\n    THEN '{{ $('Webhook Admin').item.json.body.approved_at }}'::TIMESTAMPTZ\n    ELSE approved_at\n  END\nWHERE order_id = '{{ $('Webhook Admin').item.json.body.order_id }}';"
-      },
-      "id": "6d3e6d16-06fc-4454-be09-a2f79a2b65ee",
+      "id": "node-pg-update-status",
       "name": "Atualizar Status no PostgreSQL",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
-      "position": [910, 340],
+      "position": [
+        910,
+        340
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE core.orders\nSET\n  order_status = '{{ $(\"Webhook Admin\").item.json.body.order_status }}',\n  approved_at = CASE\n    WHEN '{{ $(\"Webhook Admin\").item.json.body.approved_at }}' <> ''\n    THEN '{{ $(\"Webhook Admin\").item.json.body.approved_at }}'::TIMESTAMPTZ\n    ELSE approved_at\n  END\nWHERE order_id = '{{ $(\"Webhook Admin\").item.json.body.order_id }}';"
+      },
       "credentials": {
         "postgres": {
           "id": "PPEXcNJ5kjQ8UbuR",
@@ -157,55 +201,132 @@
       }
     },
     {
+      "id": "node-respond-update-success",
+      "name": "Resposta - Status Atualizado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1130,
+        340
+      ],
       "parameters": {
         "options": {
           "responseCode": 200,
           "responseData": "{\"success\":true,\"message\":\"Status atualizado com sucesso\"}",
           "responseHeaders": {
             "entries": [
-              {"name": "Content-Type", "value": "application/json"},
-              {"name": "Access-Control-Allow-Origin", "value": "*"}
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
             ]
           }
         }
-      },
-      "id": "node-respond-update",
-      "name": "Resposta - Status Atualizado",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [1130, 340]
+      }
     }
   ],
   "connections": {
     "Webhook Admin": {
-      "main": [[{"node": "Verificar Admin Key", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Verificar Admin Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Verificar Admin Key": {
       "main": [
-        [{"node": "Roteador de Rotas", "type": "main", "index": 0}],
-        [{"node": "Resposta - Não Autorizado", "type": "main", "index": 0}]
+        [
+          {
+            "node": "É Listagem?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resposta - Não Autorizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Roteador de Rotas": {
+    "É Listagem?": {
       "main": [
-        [{"node": "Montar Query de Listagem", "type": "main", "index": 0}],
-        [{"node": "Atualizar Status no PostgreSQL", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Montar Query de Listagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Atualizar Status no PostgreSQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Montar Query de Listagem": {
-      "main": [[{"node": "Consultar Pedidos PostgreSQL", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Consultar Pedidos PostgreSQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Consultar Pedidos PostgreSQL": {
-      "main": [[{"node": "Serializar Resposta", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Serializar Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Serializar Resposta": {
-      "main": [[{"node": "Resposta - Lista de Pedidos", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Resposta - Lista de Pedidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Atualizar Status no PostgreSQL": {
-      "main": [[{"node": "Resposta - Status Atualizado", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Resposta - Status Atualizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
+  "active": true,
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "tags": [
+    "sellingvideos"
+  ]
 }
