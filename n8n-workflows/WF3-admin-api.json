@@ -173,7 +173,7 @@
       "position": [910, 400],
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE core.orders SET code_used_at = NULL WHERE order_id = '{{ $(\"Webhook Admin\").item.json.body.order_id }}';"
+        "query": "UPDATE core.orders SET code_used_at = NULL WHERE order_id = '{{ $(\"Webhook Admin\").item.json.body.order_id }}' RETURNING *;"
       },
       "credentials": {
         "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
