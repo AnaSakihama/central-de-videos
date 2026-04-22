@@ -460,7 +460,7 @@
       "parameters": {
         "fromEmail": "saleschannel.admin@gmail.com",
         "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
-        "subject": "✅ Seu Acesso VIP Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
+        "subject": "=✅ Seu Acesso VIP Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
         "emailFormat": "html",
         "html": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">  <h2>Seu pagamento foi confirmado!</h2>  <p>Olá <b>{{ $node['Montar Objeto do Pedido'].json.name }}</b>,</p>  <p>O seu pedido <b>#{{ $node['Montar Objeto do Pedido'].json.order_id }}</b> foi aprovado e o seu acesso vitalício está liberado.</p>  <p>Para entrar no canal VIP e ativar seu acesso aos vídeos, clique no botão abaixo:</p>  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\">      <a href=\"https://t.me/divulgaVovo_bot?start={{ $node['Montar Objeto do Pedido'].json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">Ativar Acesso Agora</a>    </td></tr>  </table>  <p>Seu código exclusivo de ativação é: <b>{{ $node['Montar Objeto do Pedido'].json.invite_code }}</b></p>  <p>Você será direcionado ao nosso robô do Telegram que irá validar seu pedido e te entregará o link único do canal.</p>  <p>Qualquer problema entre em contato respondendo este e-mail.</p>  <p>Sales Channel agradece sua compra!</p></div>",
         "options": {}
@@ -485,7 +485,7 @@
       "parameters": {
         "fromEmail": "saleschannel.admin@gmail.com",
         "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
-        "subject": "🛒 Pedido Recebido — Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
+        "subject": "=🛒 Pedido Recebido — Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
         "emailFormat": "html",
         "html": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\"><h2>Pedido Recebido!</h2><p>Olá <b>{{ $node['Montar Objeto do Pedido'].json.name }}</b>,</p> <p>Recebemos seu pedido <b>#{{ $node['Montar Objeto do Pedido'].json.order_id }}</b> e estamos aguardando a confirmação do pagamento.</p>  <p>Assim que for aprovado, você receberá um novo e-mail com o link de acesso ao Telegram VIP.</p><p>Para pagamentos com Pix ou Cartão a aprovação ocorre de forma muito rápida.</p><p>Equipe Sales Channel.</p></div>",
         "options": {}
@@ -531,7 +531,7 @@
       "parameters": {
         "fromEmail": "saleschannel.admin@gmail.com",
         "toEmail": "admin@saleschannel.com.br",
-        "subject": "🛒 Venda Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
+        "subject": "=🛒 Venda Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
         "emailFormat": "html",
         "html": "Relatório de venda Sales Channel - Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}",
         "options": {}

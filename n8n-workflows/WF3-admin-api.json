@@ -258,7 +258,7 @@
             },
             {
               "name": "expire_date",
-              "value": "={{ Math.floor($now.plus({ hours: 5 }).toSeconds()) }}"
+              "value": "={{ Math.floor($now.plus({ hours: 24 }).toSeconds()) }}"
             }
           ]
         },
