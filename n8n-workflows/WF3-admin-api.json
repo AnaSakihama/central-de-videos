@@ -131,7 +131,7 @@
       "credentials": {
         "postgres": {
           "id": "10",
-          "name": "PostgreSQL - SalesChannel"
+          "name": "PostgresSellingVideos"
         }
       }
     },
@@ -178,7 +178,7 @@
       "credentials": {
         "postgres": {
           "id": "10",
-          "name": "PostgreSQL - SalesChannel"
+          "name": "PostgresSellingVideos"
         }
       }
     },

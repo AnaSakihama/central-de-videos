@@ -3,127 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedido Recebido | SellingVideos VIP</title>
+    <title>Sucesso! | SellingVideos VIP</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="landing-page/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6c63ff;
+            --primary-light: #a78bfa;
+            --accent: #ff9f43;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: #f8f9fc;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: #fff;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            text-align: center;
+            overflow-x: hidden;
             padding: 20px;
         }
-        .success-card {
-            background: #fff;
-            max-width: 500px;
+
+        /* ── Decorativos de Fundo ────────────────────────────── */
+        .blob {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            filter: blur(80px);
+            opacity: 0.15;
+            border-radius: 50%;
+            z-index: -1;
+            animation: move 20s infinite alternate;
+        }
+        @keyframes move {
+            from { transform: translate(-50%, -50%); }
+            to { transform: translate(50%, 50%); }
+        }
+
+        /* ── Card Principal (Glassmorphism) ───────────────────── */
+        .container {
+            max-width: 580px;
             width: 100%;
-            padding: 3rem 2rem;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(108,99,255,0.12);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 4rem 2rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .icon-circle {
-            width: 80px;
-            height: 80px;
-            background: #6c63ff;
-            color: #fff;
-            font-size: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Animação de Sucesso ──────────────────────────────── */
+        .success-animation {
+            margin: 0 auto 2.5rem;
+        }
+        .checkmark {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            margin: 0 auto 1.5rem;
-            animation: bounceIn 0.8s ease;
+            display: block;
+            stroke-width: 2;
+            stroke: #4ade80;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #4ade80;
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+            position: relative;
+            margin: 0 auto;
         }
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #4ade80;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+        @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+        @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px rgba(74, 222, 128, 0.1); } }
+
+        /* ── Tipografia ─────────────────────────────────────── */
         h1 {
-            font-size: 1.8rem;
-            color: #1a1a2e;
-            margin-bottom: 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
             font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+
         p {
-            color: #666;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
             line-height: 1.6;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
-        .steps-box {
-            background: #f0efff;
-            border-radius: 16px;
-            padding: 1.5rem;
+
+        /* ── Passos ─────────────────────────────────────────── */
+        .steps {
+            display: grid;
+            gap: 1rem;
             text-align: left;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
-        .step-item {
+        .step {
             display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            color: #444;
+            align-items: flex-start;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.25rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
         }
-        .step-num {
-            background: #6c63ff;
-            color: #fff;
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            border-radius: 50%;
+        .step:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--primary-light);
+            transform: translateX(5px);
+        }
+        .step-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
+            font-weight: 800;
+            font-size: 0.9rem;
         }
-        .btn-telegram {
-            background: #0088cc;
-            color: #fff;
-            padding: 14px 24px;
-            border-radius: 12px;
+        .step-content h4 { font-size: 1rem; margin-bottom: 4px; color: #fff; }
+        .step-content p { font-size: 0.9rem; margin-bottom: 0; color: rgba(255, 255, 255, 0.6); }
+
+        /* ── Botões ─────────────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 1.25rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
             text-decoration: none;
-            display: inline-block;
-            font-weight: 700;
-            transition: transform 0.2s;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            gap: 10px;
         }
-        .btn-telegram:hover { transform: translateY(-2px); }
-        
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.05); opacity: 1; }
-            70% { transform: scale(0.9); }
-            100% { transform: scale(1); }
+        .btn-primary {
+            background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%);
+            color: #fff;
+            box-shadow: 0 10px 25px -5px rgba(108, 99, 255, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(108, 99, 255, 0.6);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 1rem;
+        }
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .container { padding: 3rem 1.5rem; }
+            h1 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="success-card">
-        <div class="icon-circle">✅</div>
+
+    <div class="blob"></div>
+
+    <div class="container">
+        <div class="success-animation">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+        </div>
+
         <h1>Pedido Recebido!</h1>
-        <p>Parabéns por garantir o seu acesso ao <strong>SellingVideos VIP</strong>. Nossa automação já está processando sua entrada.</p>
+        <p>Prepare o seu Telegram. Em instantes o seu <strong>Acesso Vitalício</strong> será entregue no seu e-mail.</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-icon">1</div>
+                <div class="step-content">
+                    <h4>Verifique seu E-mail</h4>
+                    <p>Procure por "Seu Acesso VIP SellingVideos". (Olhe o Spam também!)</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-icon">2</div>
+                <div class="step-content">
+                    <h4>Copie seu Código</h4>
+                    <p>Dentro do e-mail haverá o seu convite exclusivo.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-icon">3</div>
+                <div class="step-content">
+                    <h4>Ative o Bot</h4>
+                    <p>Clique no link do e-mail para validar seu acesso e entrar no canal.</p>
+                </div>
+            </div>
+        </div>
+
+        <a href="suporte.html" class="btn btn-primary">
+            🚀 Precisa de ajuda? Fale com o suporte
+        </a>
         
-        <div class="steps-box">
-            <div class="step-item">
-                <div class="step-num">1</div>
-                <span>Aguarde a confirmação do Mercado Pago (Pix e Cartão são imediatos).</span>
-            </div>
-            <div class="step-item">
-                <div class="step-num">2</div>
-                <span>Você receberá um <strong>e-mail</strong> com o seu código de acesso exclusivo.</span>
-            </div>
-            <div class="step-item">
-                <div class="step-num">3</div>
-                <span>Clique no link do e-mail para abrir o Bot e entrar no Canal.</span>
-            </div>
-        </div>
-
-        <p style="font-size: 0.85rem; color: #999;">Dica: Verifique sua pasta de Spam ou Promoções se não encontrar o e-mail em 5 minutos.</p>
-
-        <div style="border-top: 1px solid #eee; padding-top: 2rem;">
-            <p style="margin-bottom: 1rem; font-weight: 600;">Precisa de ajuda urgente?</p>
-            <a href="suporte.html" class="btn-telegram" style="background: #333;">Acessar Central de Suporte</a>
-        </div>
+        <p class="footer-note">
+            Pagamento 100% processado pelo Mercado Pago. <br>
+            SellingVideos &copy; 2026.
+        </p>
     </div>
+
 </body>
 </html>

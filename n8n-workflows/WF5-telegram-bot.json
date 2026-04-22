@@ -79,7 +79,7 @@
           "parameters": [
             { "name": "chat_id", "value": "-1003846840774" },
             { "name": "member_limit", "value": 1 },
-            { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 300 }}" }
+            { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 43200 }}" }
           ]
         }
       }
