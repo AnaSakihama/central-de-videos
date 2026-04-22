@@ -104,7 +104,7 @@
       "typeVersion": 2,
       "position": [
         -1760,
-        40
+          40
       ]
     },
     {
@@ -120,7 +120,7 @@
       "typeVersion": 4,
       "position": [
         -1520,
-        40
+          40
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -139,7 +139,7 @@
       "typeVersion": 2,
       "position": [
         -1280,
-        40
+          40
       ]
     },
     {
@@ -265,7 +265,7 @@
       "typeVersion": 2,
       "position": [
         -560,
-        20
+          20
       ]
     },
     {
@@ -399,7 +399,58 @@
       "typeVersion": 2,
       "position": [
         400,
-        40
+          40
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = '{{ $node['Montar Objeto do Pedido'].json.order_id }}' AND (log_email IS NULL OR log_email != 'VIP_ENVIADO') RETURNING *;",
+        "options": {}
+      },
+      "id": "node-lock-vip",
+      "name": "Marcar VIP (Trava)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        650,
+        -250
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "PPEXcNJ5kjQ8UbuR",
+          "name": "PostgresSellingVideos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "was-locked",
+              "leftValue": "={{ $json.order_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "node-if-locked-vip",
+      "name": "Bloqueou VIP?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        870,
+        -250
       ]
     },
     {
@@ -415,8 +466,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        650,
-        -220
+        1100,
+        -250
       ],
       "credentials": {
         "smtp": {
@@ -439,33 +490,12 @@
       "typeVersion": 2,
       "position": [
         650,
-        20
+          20
       ],
       "credentials": {
         "smtp": {
           "id": "GPuwtl92ipORGmS6",
           "name": "SMTP account SalesChannel"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = '{{ $node['Montar Objeto do Pedido'].json.order_id }}';",
-        "options": {}
-      },
-      "id": "node-mark-vip",
-      "name": "Marcar VIP",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2,
-      "position": [
-        870,
-        -220
-      ],
-      "credentials": {
-        "postgres": {
-          "id": "PPEXcNJ5kjQ8UbuR",
-          "name": "PostgresSellingVideos"
         }
       }
     },
@@ -481,7 +511,7 @@
       "typeVersion": 2,
       "position": [
         870,
-        20
+          20
       ],
       "credentials": {
         "postgres": {
@@ -503,8 +533,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        1100,
-        -100
+        1350,
+        -150
       ],
       "credentials": {
         "smtp": {
@@ -692,7 +722,40 @@
       "main": [
         [
           {
+            "node": "Marcar VIP (Trava)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar VIP (Trava)": {
+      "main": [
+        [
+          {
+            "node": "Bloqueou VIP?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bloqueou VIP?": {
+      "main": [
+        [
+          {
             "node": "Email VIP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email VIP": {
+      "main": [
+        [
+          {
+            "node": "Relatório Admin",
             "type": "main",
             "index": 0
           }
@@ -710,33 +773,11 @@
         ]
       ]
     },
-    "Email VIP": {
-      "main": [
-        [
-          {
-            "node": "Marcar VIP",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Email Pedido Recebido": {
       "main": [
         [
           {
             "node": "Marcar Pendente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Marcar VIP": {
-      "main": [
-        [
-          {
-            "node": "Relatório Admin",
             "type": "main",
             "index": 0
           }
