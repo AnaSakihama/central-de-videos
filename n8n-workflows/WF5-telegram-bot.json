@@ -22,7 +22,7 @@
       "position": [470, 300],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  // Regex robusta para capturar o código após /start (com ou sem espaço)\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{ json: { code, chat_id: chatId, first_name: firstName, raw_text: text } }];"
+        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  // Regex robusta para capturar o código após /start\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{ json: { code, chat_id: chatId, first_name: firstName, raw_text: text } }];"
       }
     },
     {
@@ -49,7 +49,7 @@
         "query": "SELECT order_id, name, email FROM core.orders WHERE invite_code = '{{ $json.code }}' AND code_used_at IS NULL LIMIT 1;"
       },
       "credentials": {
-        "postgres": { "id": "10", "name": "PostgreSQL - SalesChannel" }
+        "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
       }
     },
     {
@@ -78,7 +78,7 @@
         "bodyParameters": {
           "parameters": [
             { "name": "chat_id", "value": "COLE_AQUI_O_CHAT_ID_DO_CANAL" },
-            { "name": "member_limit", "value": "1" },
+            { "name": "member_limit", "value": 1 },
             { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 300 }}" }
           ]
         }
@@ -111,10 +111,10 @@
       "position": [1790, 150],
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE core.orders SET code_used_at = NOW(), order_status = 'aprovado_no_telegram' WHERE invite_code = '{{ $('Extrair Código /start').item.json.code }}';"
+        "query": "UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE invite_code = '{{ $('Extrair Código /start').item.json.code }}';"
       },
       "credentials": {
-        "postgres": { "id": "10", "name": "PostgreSQL - SalesChannel" }
+        "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
       }
     },
     {
