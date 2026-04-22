@@ -326,6 +326,11 @@
     {
       "parameters": {
         "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "is-vip-not-sent",
@@ -338,7 +343,7 @@
             },
             {
               "id": "vip-flag",
-              "leftValue": "={{ $json.log_email }}",
+              "leftValue": "={{ $json.log_email || '' }}",
               "operator": {
                 "type": "string",
                 "operation": "notEquals"
@@ -361,6 +366,11 @@
     {
       "parameters": {
         "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "is-pend",
@@ -373,7 +383,7 @@
             },
             {
               "id": "not-sent-yet",
-              "leftValue": "={{ $json.log_email }}",
+              "leftValue": "={{ $json.log_email || '' }}",
               "operator": {
                 "type": "string",
                 "operation": "isEmpty"
