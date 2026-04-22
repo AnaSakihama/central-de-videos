@@ -1,15 +1,12 @@
 {
-  "name": "WF3 — Admin API (Nova Versão)",
+  "name": "WF3 — Admin API (sellingvideos)",
   "nodes": [
     {
       "id": "node-webhook-admin",
       "name": "Webhook Admin",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [
-        250,
-        300
-      ],
+      "position": [250, 300],
       "parameters": {
         "httpMethod": "POST",
         "path": "admin",
@@ -22,10 +19,7 @@
       "name": "Verificar Admin Key",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [
-        470,
-        300
-      ],
+      "position": [470, 300],
       "parameters": {
         "conditions": {
           "options": {
@@ -49,57 +43,36 @@
       }
     },
     {
-      "id": "node-is-list-route",
-      "name": "É Listagem?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        690,
-        250
-      ],
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": false,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "is-list",
-              "leftValue": "={{ $json.body?.action || 'listar_pedidos' }}",
-              "rightValue": "listar_pedidos",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        }
-      }
-    },
-    {
       "id": "node-respond-unauthorized",
       "name": "Resposta - Não Autorizado",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [
-        690,
-        450
-      ],
+      "position": [690, 450],
       "parameters": {
         "options": {
           "responseCode": 401,
           "responseData": "{\"error\":\"Unauthorized\"}",
           "responseHeaders": {
-            "entries": [
-              {
-                "name": "Content-Type",
-                "value": "application/json"
-              }
-            ]
+            "entries": [{"name": "Content-Type", "value": "application/json"}]
           }
+        }
+      }
+    },
+    {
+      "id": "node-router",
+      "name": "Roteador de Ações",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [690, 250],
+      "parameters": {
+        "dataType": "string",
+        "value": "={{ $json.body?.action || 'listar_pedidos' }}",
+        "rules": {
+          "rules": [
+            { "value": "listar_pedidos" },
+            { "value": "atualizar_status", "output": 1 },
+            { "value": "redefinir_acesso", "output": 2 }
+          ]
         }
       }
     },
@@ -108,10 +81,7 @@
       "name": "Montar Query de Listagem",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        910,
-        180
-      ],
+      "position": [910, 100],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const items = $input.all();\nif (!items || items.length === 0) return [];\nconst body = items[0].json.body || {};\nconst query = items[0].json.query || {};\nconst search = (query.search || body.search || '').toString().toLowerCase();\nconst paymentStatus = (query.payment_status || body.payment_status || '').toString().toLowerCase();\nconst orderStatus = (query.order_status || body.order_status || '').toString().toLowerCase();\nconst conditions = [];\nconst params = [];\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\nreturn [{ json: { sql, params } }];"
@@ -122,20 +92,14 @@
       "name": "Consultar Pedidos PostgreSQL",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
-      "position": [
-        1130,
-        180
-      ],
+      "position": [1130, 100],
       "parameters": {
         "operation": "executeQuery",
         "query": "={{ $json.sql }}",
         "additionalFields": {}
       },
       "credentials": {
-        "postgres": {
-          "id": "PPEXcNJ5kjQ8UbuR",
-          "name": "PostgresSellingVideos"
-        }
+        "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
       }
     },
     {
@@ -143,10 +107,7 @@
       "name": "Serializar Resposta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        1350,
-        180
-      ],
+      "position": [1350, 100],
       "parameters": {
         "mode": "runOnceForAllItems",
         "jsCode": "const orders = $input.all().map(i => i.json);\nreturn [{ json: { orders, total: orders.length } }];"
@@ -157,24 +118,15 @@
       "name": "Resposta - Lista de Pedidos",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [
-        1570,
-        180
-      ],
+      "position": [1570, 100],
       "parameters": {
         "options": {
           "responseCode": 200,
           "responseData": "={{ JSON.stringify($json) }}",
           "responseHeaders": {
             "entries": [
-              {
-                "name": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "name": "Access-Control-Allow-Origin",
-                "value": "*"
-              }
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Access-Control-Allow-Origin", "value": "*" }
             ]
           }
         }
@@ -185,19 +137,13 @@
       "name": "Atualizar Status no PostgreSQL",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
-      "position": [
-        910,
-        340
-      ],
+      "position": [910, 250],
       "parameters": {
         "operation": "executeQuery",
         "query": "UPDATE core.orders\nSET\n  order_status = '{{ $(\"Webhook Admin\").item.json.body.order_status }}',\n  approved_at = CASE\n    WHEN '{{ $(\"Webhook Admin\").item.json.body.approved_at }}' <> ''\n    THEN '{{ $(\"Webhook Admin\").item.json.body.approved_at }}'::TIMESTAMPTZ\n    ELSE approved_at\n  END\nWHERE order_id = '{{ $(\"Webhook Admin\").item.json.body.order_id }}';"
       },
       "credentials": {
-        "postgres": {
-          "id": "PPEXcNJ5kjQ8UbuR",
-          "name": "PostgresSellingVideos"
-        }
+        "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
       }
     },
     {
@@ -205,24 +151,67 @@
       "name": "Resposta - Status Atualizado",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [
-        1130,
-        340
-      ],
+      "position": [1130, 250],
       "parameters": {
         "options": {
           "responseCode": 200,
           "responseData": "{\"success\":true,\"message\":\"Status atualizado com sucesso\"}",
           "responseHeaders": {
             "entries": [
-              {
-                "name": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "name": "Access-Control-Allow-Origin",
-                "value": "*"
-              }
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Access-Control-Allow-Origin", "value": "*" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "node-pg-reset-code",
+      "name": "Resetar Uso no DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [910, 400],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE core.orders SET code_used_at = NULL WHERE order_id = '{{ $(\"Webhook Admin\").item.json.body.order_id }}';"
+      },
+      "credentials": {
+        "postgres": { "id": "PPEXcNJ5kjQ8UbuR", "name": "PostgresSellingVideos" }
+      }
+    },
+    {
+      "id": "node-tg-gen-manual-link",
+      "name": "Gerar Novo Link Manual",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1130, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/createChatInviteLink",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "chat_id", "value": "-1003846840774" },
+            { "name": "member_limit", "value": 1 },
+            { "name": "expire_date", "value": "={{ Math.floor(Date.now()/1000) + 14400 }}" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-respond-reset-success",
+      "name": "Resposta - Link Gerado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1350, 400],
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseData": "={{ JSON.stringify({ success: true, invite_link: $json.result.invite_link }) }}",
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Access-Control-Allow-Origin", "value": "*" }
             ]
           }
         }
@@ -231,102 +220,42 @@
   ],
   "connections": {
     "Webhook Admin": {
-      "main": [
-        [
-          {
-            "node": "Verificar Admin Key",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Verificar Admin Key", "type": "main", "index": 0 }]]
     },
     "Verificar Admin Key": {
       "main": [
-        [
-          {
-            "node": "É Listagem?",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Resposta - Não Autorizado",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Roteador de Ações", "type": "main", "index": 0 }],
+        [{ "node": "Resposta - Não Autorizado", "type": "main", "index": 0 }]
       ]
     },
-    "É Listagem?": {
+    "Roteador de Ações": {
       "main": [
-        [
-          {
-            "node": "Montar Query de Listagem",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Atualizar Status no PostgreSQL",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Montar Query de Listagem", "type": "main", "index": 0 }],
+        [{ "node": "Atualizar Status no PostgreSQL", "type": "main", "index": 0 }],
+        [{ "node": "Resetar Uso no DB", "type": "main", "index": 0 }]
       ]
     },
     "Montar Query de Listagem": {
-      "main": [
-        [
-          {
-            "node": "Consultar Pedidos PostgreSQL",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Consultar Pedidos PostgreSQL", "type": "main", "index": 0 }]]
     },
     "Consultar Pedidos PostgreSQL": {
-      "main": [
-        [
-          {
-            "node": "Serializar Resposta",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Serializar Resposta", "type": "main", "index": 0 }]]
     },
     "Serializar Resposta": {
-      "main": [
-        [
-          {
-            "node": "Resposta - Lista de Pedidos",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Resposta - Lista de Pedidos", "type": "main", "index": 0 }]]
     },
     "Atualizar Status no PostgreSQL": {
-      "main": [
-        [
-          {
-            "node": "Resposta - Status Atualizado",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Resposta - Status Atualizado", "type": "main", "index": 0 }]]
+    },
+    "Resetar Uso no DB": {
+      "main": [[{ "node": "Gerar Novo Link Manual", "type": "main", "index": 0 }]]
+    },
+    "Gerar Novo Link Manual": {
+      "main": [[{ "node": "Resposta - Link Gerado", "type": "main", "index": 0 }]]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
-  },
-  "tags": [
-    "sellingvideos"
-  ]
+  }
 }

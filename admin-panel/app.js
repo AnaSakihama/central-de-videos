@@ -223,9 +223,19 @@ function openOrderModal(orderId) {
           🚫 Rejeitar
         </button>
       ` : ''}
+      <button class="btn" style="background:#6c63ff; color:white;" onclick="resetAccess('${order.order_id}')">
+        🔄 Redefinir e Gerar Novo Link
+      </button>
       <button class="btn" style="background:var(--bg-hover); color:var(--text-secondary);" onclick="closeModal()">
         Fechar
       </button>
+    </div>
+    <div id="resetResult" style="margin-top:16px; display:none; padding:12px; background:rgba(108,99,255,0.05); border-radius:10px; border:1px solid rgba(108,99,255,0.2);">
+      <p style="font-size:11px; color:#6c63ff; font-weight:bold; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Link Gerado com Sucesso</p>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input type="text" id="newInviteLink" readonly style="background:var(--bg-panel); border:1px solid var(--border-color); color:var(--text-primary); padding:8px 12px; border-radius:6px; flex:1; font-size:12px; font-family:monospace;">
+        <button onclick="copyNewLink()" style="background:#6c63ff; border:none; color:white; padding:8px 15px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; transition:0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Copiar</button>
+      </div>
     </div>
   `;
 
@@ -250,7 +260,6 @@ function closeModalOutside(e) {
 // ── Update Status ─────────────────────────────
 async function updateStatus(orderId, newStatus) {
   try {
-    // WF3 usa um único endpoint POST com action: atualizar_status
     const res = await fetch(API_BASE, {
       method: 'POST',
       headers: getHeaders(),
@@ -268,6 +277,50 @@ async function updateStatus(orderId, newStatus) {
   } catch (err) {
     alert('Erro ao atualizar status: ' + err.message);
   }
+}
+
+async function resetAccess(orderId) {
+  const btn = document.querySelector('.modal-actions button[onclick*="resetAccess"]');
+  const originalText = btn.textContent;
+  
+  try {
+    btn.disabled = true;
+    btn.textContent = '⏳ Gerando...';
+    
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        action: 'redefinir_acesso',
+        order_id: orderId
+      })
+    });
+    
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    
+    if (data.invite_link) {
+      const resultDiv = document.getElementById('resetResult');
+      const input = document.getElementById('newInviteLink');
+      input.value = data.invite_link;
+      resultDiv.style.display = 'block';
+      btn.textContent = '✅ Sucesso!';
+      setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
+    } else {
+      throw new Error('Link não retornado pela API');
+    }
+  } catch (err) {
+    alert('Erro ao redefinir acesso: ' + err.message);
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}
+
+function copyNewLink() {
+  const input = document.getElementById('newInviteLink');
+  input.select();
+  document.execCommand('copy');
+  alert('Link copiado para a área de transferência!');
 }
 
 // ── Loading / Error states ─────────────────────
