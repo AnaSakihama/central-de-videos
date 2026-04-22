@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suporte Central | SellingVideos</title>
+    <title>Suporte Central | SalesChannel</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary: #6c63ff;
@@ -18,7 +21,11 @@
             --input-bg: rgba(255, 255, 255, 0.05);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -52,7 +59,18 @@
             margin-bottom: 3rem;
             animation: fadeIn 0.8s ease-out;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         header h1 {
             font-family: 'Outfit', sans-serif;
@@ -63,7 +81,11 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
         }
-        header p { color: rgba(255,255,255,0.6); font-size: 1.1rem; }
+
+        header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+        }
 
         /* ── Container do Formulário (Glassmorphism) ──────────── */
         .support-card {
@@ -78,7 +100,18 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         .back-link {
             display: inline-flex;
@@ -89,7 +122,10 @@
             margin-bottom: 2rem;
             transition: color 0.3s;
         }
-        .back-link:hover { color: #fff; }
+
+        .back-link:hover {
+            color: #fff;
+        }
 
         /* ── Form Elements ──────────────────────────────────── */
         .form-grid {
@@ -98,21 +134,29 @@
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
 
-        .form-group { margin-bottom: 1.5rem; }
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
         .form-group label {
             display: block;
             font-size: 0.85rem;
             font-weight: 600;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             margin-bottom: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        .form-group input, 
-        .form-group textarea, 
+        .form-group input,
+        .form-group textarea,
         .form-group select {
             width: 100%;
             background: var(--input-bg);
@@ -125,14 +169,18 @@
             transition: all 0.3s;
             outline: none;
         }
-        .form-group input:focus, 
+
+        .form-group input:focus,
         .form-group textarea:focus {
             border-color: var(--primary);
             background: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 20px rgba(108, 99, 255, 0.15);
         }
 
-        .form-group textarea { min-height: 150px; resize: none; }
+        .form-group textarea {
+            min-height: 150px;
+            resize: none;
+        }
 
         /* ── Upload Area ────────────────────────────────────── */
         .file-drop {
@@ -142,15 +190,26 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
             margin-bottom: 1.5rem;
         }
+
         .file-drop:hover {
             border-color: var(--primary);
             background: rgba(108, 99, 255, 0.05);
         }
-        .file-drop svg { width: 32px; height: 32px; color: var(--primary); margin-bottom: 0.5rem; }
-        .file-drop p { font-size: 0.9rem; color: rgba(255,255,255,0.4); }
+
+        .file-drop svg {
+            width: 32px;
+            height: 32px;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-drop p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
 
         #filePreview {
             display: flex;
@@ -158,6 +217,7 @@
             gap: 10px;
             margin-top: 10px;
         }
+
         .file-chip {
             background: rgba(108, 99, 255, 0.15);
             padding: 6px 14px;
@@ -184,11 +244,17 @@
             box-shadow: 0 10px 25px -5px rgba(108, 99, 255, 0.4);
             margin-top: 1rem;
         }
+
         .btn-submit:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px -5px rgba(108, 99, 255, 0.6);
         }
-        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* ── Feedback Boxes ─────────────────────────────────── */
         .feedback {
@@ -200,11 +266,21 @@
             font-size: 0.95rem;
             animation: fadeIn 0.4s;
         }
-        .feedback.success { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.2); }
-        .feedback.error { background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.2); }
 
+        .feedback.success {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .feedback.error {
+            background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
     </style>
 </head>
+
 <body>
 
     <div class="blob"></div>
@@ -254,7 +330,11 @@
             <div class="form-group">
                 <label>Anexos (Opcional)</label>
                 <div class="file-drop" onclick="document.getElementById('imagens').click()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                        </path>
+                    </svg>
                     <p>Clique para enviar capturas de tela</p>
                     <input type="file" id="imagens" accept="image/*" multiple style="display:none">
                 </div>
@@ -268,7 +348,7 @@
     </div>
 
     <footer style="margin-top: 3rem; opacity: 0.3; font-size: 0.8rem;">
-        SellingVideos &copy; 2026. Atendimento Prioritário.
+        SalesChannel &copy; 2026. Atendimento Prioritário.
     </footer>
 
     <script>
@@ -283,7 +363,7 @@
 
         function renderPreview() {
             filePreview.innerHTML = selectedFiles.map((f, i) => `
-                <div class="file-chip">📷 ${f.name.substring(0,10)}...</div>
+                <div class="file-chip">📷 ${f.name.substring(0, 10)}...</div>
             `).join('');
         }
 
@@ -292,7 +372,7 @@
             const btn = document.getElementById('btnSubmit');
             const success = document.getElementById('feedback-success');
             const error = document.getElementById('feedback-error');
-            
+
             btn.disabled = true;
             btn.textContent = 'Enviando...';
             success.style.display = 'none';
@@ -329,4 +409,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sucesso! | SellingVideos VIP</title>
+    <title>Sucesso! | Sales Channel VIP</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary: #6c63ff;
@@ -18,7 +21,11 @@
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -44,9 +51,15 @@
             z-index: -1;
             animation: move 20s infinite alternate;
         }
+
         @keyframes move {
-            from { transform: translate(-50%, -50%); }
-            to { transform: translate(50%, 50%); }
+            from {
+                transform: translate(-50%, -50%);
+            }
+
+            to {
+                transform: translate(50%, 50%);
+            }
         }
 
         /* ── Card Principal (Glassmorphism) ───────────────────── */
@@ -65,14 +78,22 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ── Animação de Sucesso ──────────────────────────────── */
         .success-animation {
             margin: 0 auto 2.5rem;
         }
+
         .checkmark {
             width: 100px;
             height: 100px;
@@ -86,6 +107,7 @@
             position: relative;
             margin: 0 auto;
         }
+
         .checkmark__circle {
             stroke-dasharray: 166;
             stroke-dashoffset: 166;
@@ -95,6 +117,7 @@
             fill: none;
             animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
         }
+
         .checkmark__check {
             transform-origin: 50% 50%;
             stroke-dasharray: 48;
@@ -102,9 +125,29 @@
             animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
         }
 
-        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
-        @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
-        @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px rgba(74, 222, 128, 0.1); } }
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes scale {
+
+            0%,
+            100% {
+                transform: none;
+            }
+
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 50px rgba(74, 222, 128, 0.1);
+            }
+        }
 
         /* ── Tipografia ─────────────────────────────────────── */
         h1 {
@@ -131,6 +174,7 @@
             text-align: left;
             margin-bottom: 3rem;
         }
+
         .step {
             display: flex;
             align-items: flex-start;
@@ -141,11 +185,13 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.3s;
         }
+
         .step:hover {
             background: rgba(255, 255, 255, 0.06);
             border-color: var(--primary-light);
             transform: translateX(5px);
         }
+
         .step-icon {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             width: 32px;
@@ -158,8 +204,18 @@
             font-weight: 800;
             font-size: 0.9rem;
         }
-        .step-content h4 { font-size: 1rem; margin-bottom: 4px; color: #fff; }
-        .step-content p { font-size: 0.9rem; margin-bottom: 0; color: rgba(255, 255, 255, 0.6); }
+
+        .step-content h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.6);
+        }
 
         /* ── Botões ─────────────────────────────────────────── */
         .btn {
@@ -177,21 +233,25 @@
             border: none;
             gap: 10px;
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%);
             color: #fff;
             box-shadow: 0 10px 25px -5px rgba(108, 99, 255, 0.4);
         }
+
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px -5px rgba(108, 99, 255, 0.6);
         }
+
         .btn-ghost {
             background: transparent;
             color: rgba(255, 255, 255, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin-top: 1rem;
         }
+
         .btn-ghost:hover {
             background: rgba(255, 255, 255, 0.05);
             color: #fff;
@@ -205,11 +265,17 @@
 
         /* Mobile Adjustments */
         @media (max-width: 480px) {
-            .container { padding: 3rem 1.5rem; }
-            h1 { font-size: 2rem; }
+            .container {
+                padding: 3rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="blob"></div>
@@ -217,8 +283,8 @@
     <div class="container">
         <div class="success-animation">
             <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
             </svg>
         </div>
 
@@ -237,14 +303,15 @@
                 <div class="step-icon">2</div>
                 <div class="step-content">
                     <h4>Ative o acesso</h4>
-                    <p>Dentro do e-mail terá um botão "Ativar Acesso Agora". Ele te direcionará para o robô do telegram que fornecerá o link do canal VideosTopAfiliados.</p>
+                    <p>Dentro do e-mail terá um botão "Ativar Acesso Agora". Ele te direcionará para o robô do telegram
+                        que fornecerá o link do canal VideosTopAfiliados.</p>
                 </div>
             </div>
             <div class="step">
                 <div class="step-icon">3</div>
                 <div class="step-content">
                     <h4>Entre no canal de vídeos</h4>
-                    <p>Com o link do canal em mãos, basta acessar. Fique atento, este link tem expira em 4 horas.</p>
+                    <p>Com o link do canal em mãos, basta acessar. Fique atento, este link expira em 4 horas.</p>
                 </div>
             </div>
         </div>
@@ -252,12 +319,13 @@
         <a href="suporte.html" class="btn btn-primary">
             🚀 Precisa de ajuda? Fale com o suporte
         </a>
-        
+
         <p class="footer-note">
             Pagamento 100% processado pelo Mercado Pago. <br>
-            SellingVideos &copy; 2026.
+            Sales Channel &copy; 2026.
         </p>
     </div>
 
 </body>
+
 </html>
