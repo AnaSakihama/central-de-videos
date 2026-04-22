@@ -65,45 +65,23 @@
       "typeVersion": 3,
       "position": [690, 250],
       "parameters": {
-        "mode": "expression",
-        "output": "single",
+        "dataType": "string",
+        "value": "={{ $json.body?.action || 'listar_pedidos' }}",
         "rules": {
           "rules": [
             {
-              "outputKey": "listar",
-              "value2": "listar_pedidos",
-              "conditions": {
-                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"},
-                "conditions": [
-                  {
-                    "id": "route-list",
-                    "leftValue": "={{ $json.body?.action || 'listar_pedidos' }}",
-                    "rightValue": "listar_pedidos",
-                    "operator": {"type": "string", "operation": "equals"}
-                  }
-                ],
-                "combinator": "and"
-              }
+              "operation": "equals",
+              "value": "listar_pedidos",
+              "output": 0
             },
             {
-              "outputKey": "atualizar",
-              "value2": "atualizar_status",
-              "conditions": {
-                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"},
-                "conditions": [
-                  {
-                    "id": "route-update",
-                    "leftValue": "={{ $json.body?.action }}",
-                    "rightValue": "atualizar_status",
-                    "operator": {"type": "string", "operation": "equals"}
-                  }
-                ],
-                "combinator": "and"
-              }
+              "operation": "equals",
+              "value": "atualizar_status",
+              "output": 1
             }
           ]
         },
-        "fallbackOutput": "none"
+        "options": {}
       }
     },
     {
@@ -114,7 +92,7 @@
       "position": [910, 180],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const body  = $('Webhook Admin').first().json.body  || {};\nconst query = $('Webhook Admin').first().json.query || {};\n\nconst search        = (query.search          || body.search          || '').toLowerCase();\nconst paymentStatus = (query.payment_status  || body.payment_status  || '').toLowerCase();\nconst orderStatus   = (query.order_status    || body.order_status    || '').toLowerCase();\n\nconst conditions = [];\nconst params     = [];\n\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\n\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql   = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\n\nreturn [{ json: { sql, params } }];"
+        "jsCode": "// Proteção contra entrada indefinida\nconst items = $input.all();\nif (!items || items.length === 0) return [];\n\nconst body  = items[0].json.body  || {};\nconst query = items[0].json.query || {};\n\nconst search        = (query.search          || body.search          || '').toString().toLowerCase();\nconst paymentStatus = (query.payment_status  || body.payment_status  || '').toString().toLowerCase();\nconst orderStatus   = (query.order_status    || body.order_status    || '').toString().toLowerCase();\n\nconst conditions = [];\nconst params     = [];\n\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\n\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql   = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\n\nreturn [{ json: { sql, params } }];"
       }
     },
     {
