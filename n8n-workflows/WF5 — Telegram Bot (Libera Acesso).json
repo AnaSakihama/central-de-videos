@@ -7,27 +7,27 @@
         "path": "telegram-bot",
         "options": {}
       },
-      "id": "5b0ce06f-9342-40bd-b275-7c6b6532ccab",
+      "id": "2666e267-abd2-495d-a232-7866a9fcca70",
       "name": "Webhook Telegram",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -2944,
-        -192
+        -3712,
+        -624
       ],
       "webhookId": "b4b37e98-9f72-4a8b-8b25-356b1ba00447"
     },
     {
       "parameters": {
-        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  // Regex robusta para capturar o código após /start\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{ json: { code, chat_id: chatId, first_name: firstName, raw_text: text } }];"
+        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst userId = msg.from?.id || null;\nconst chatType = msg.chat?.type || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{\n  json: {\n    code,\n    chat_id: chatId,\n    user_id: userId,\n    chat_type: chatType,\n    first_name: firstName,\n    raw_text: text\n  }\n}];"
       },
-      "id": "61848b00-daed-499b-b087-29e0d44e9d7c",
+      "id": "a48bbb2e-ce71-4e01-85a1-a5b1e76b39c6",
       "name": "Extrair Código /start",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2720,
-        -192
+        -3488,
+        -624
       ]
     },
     {
@@ -51,13 +51,13 @@
         },
         "options": {}
       },
-      "id": "6d9d9dad-fffc-44fc-91c0-d4b1b788c914",
+      "id": "902ccb82-9140-4ef7-8ecc-e9fe45b7151c",
       "name": "Tem código?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -2496,
-        -192
+        -3264,
+        -624
       ]
     },
     {
@@ -66,13 +66,13 @@
         "query": "SELECT order_id, name, email FROM core.orders WHERE invite_code = '{{ $json.code }}' AND code_used_at IS NULL LIMIT 1;",
         "options": {}
       },
-      "id": "4e07d1bb-9dce-432d-b4b2-626048e838a5",
+      "id": "129b6c58-5e88-489c-bdff-44e4fd45961d",
       "name": "Validar Código no DB",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -2288,
-        -288
+        -3056,
+        -720
       ],
       "credentials": {
         "postgres": {
@@ -87,7 +87,8 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict"
+            "typeValidation": "strict",
+            "version": 1
           },
           "conditions": [
             {
@@ -98,17 +99,18 @@
                 "operation": "notEmpty"
               }
             }
-          ]
+          ],
+          "combinator": "and"
         },
         "options": {}
       },
-      "id": "799dbe3e-93d6-4e4e-ac50-ff206e802b8e",
+      "id": "6c506874-ec6b-4f8a-bb1c-6cc69af99446",
       "name": "Código Válido?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -2064,
-        -288
+        -2832,
+        -720
       ]
     },
     {
@@ -123,24 +125,24 @@
               "value": "-1003846840774"
             },
             {
-              "name": "member_limit",
-              "value": 1
+              "name": "expire_date",
+              "value": "={{ Math.floor($now.plus({ hours: 4 }).toSeconds()) }}"
             },
             {
-              "name": "expire_date",
-              "value": "={{ Math.floor($now.plus({ hours: 24 }).toSeconds()) }}"
+              "name": "member_limit",
+              "value": "1"
             }
           ]
         },
         "options": {}
       },
-      "id": "f8dcd599-32a8-4d77-a7fa-a37afabc2f84",
+      "id": "4e842fc8-6ef5-4d97-aac5-85137ed418a2",
       "name": "Gerar Link Temporário",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -1840,
-        -336
+        -2608,
+        -768
       ]
     },
     {
@@ -152,7 +154,7 @@
           "parameters": [
             {
               "name": "chat_id",
-              "value": "={{ $('Extrair Código /start').item.json.chat_id }}"
+              "value": "={{ $('Extrair Código /start').item.json.user_id }}"
             },
             {
               "name": "text",
@@ -170,13 +172,13 @@
         },
         "options": {}
       },
-      "id": "e7790b05-da70-4d84-84d7-830dcb99331a",
+      "id": "2eb1b9cb-fc31-4ae8-bc99-dc10d6d8576b",
       "name": "Enviar Link ao Usuário",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -1616,
-        -336
+        -2384,
+        -768
       ]
     },
     {
@@ -185,13 +187,13 @@
         "query": "UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE invite_code = '{{ $('Extrair Código /start').item.json.code }}';",
         "options": {}
       },
-      "id": "40320d78-7453-4876-8dd9-5b7b1dc271aa",
+      "id": "92b70f4c-a776-4762-8bd3-be32c8830e27",
       "name": "Marcar como Usado",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -1408,
-        -336
+        -2176,
+        -768
       ],
       "credentials": {
         "postgres": {
@@ -209,7 +211,7 @@
           "parameters": [
             {
               "name": "chat_id",
-              "value": "={{ $node['Extrair Código /start'].json.chat_id }}"
+              "value": "={{ $node['Extrair Código /start'].json.user_id }}"
             },
             {
               "name": "text",
@@ -223,13 +225,13 @@
         },
         "options": {}
       },
-      "id": "7ca08b6e-c132-4ef6-a8d3-239c7e05fc10",
+      "id": "d618b1ae-4439-4742-8e8a-f03d6aacc991",
       "name": "Erro - Código Inválido",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -1840,
-        -192
+        -2608,
+        -624
       ]
     },
     {
@@ -241,7 +243,7 @@
           "parameters": [
             {
               "name": "chat_id",
-              "value": "={{ $json.chat_id }}"
+              "value": "={{ $json.user_id }}"
             },
             {
               "name": "text",
@@ -255,13 +257,13 @@
         },
         "options": {}
       },
-      "id": "deaa0854-5e0e-4ae2-821c-936c98bb1534",
+      "id": "84a6642f-4ecf-438e-aa04-2d2353e8053c",
       "name": "Erro - Sem Código",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -2288,
-        -64
+        -3056,
+        -496
       ]
     }
   ],
@@ -362,9 +364,13 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "versionId": "36c62fc6-74bf-4e7b-92ce-94931528ab5d",
+  "versionId": "f5d8ee7c-40ba-49a8-9fed-4fa5cf22103f",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "52ece93edd8024eed03540d94f583084d91abce2d625f29e58c55c2eb2583682"

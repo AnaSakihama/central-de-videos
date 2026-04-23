@@ -7,13 +7,13 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "3c71b323-d5ed-480a-a5d3-6aa0d3563fc4",
+      "id": "368f0f34-f7c8-4f0b-9c49-4b71d56fb824",
       "name": "Webhook Checkout",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1856,
-        -720
+        -2640,
+        -768
       ],
       "webhookId": "a9431649-486f-4a66-9768-68cc264b1371"
     },
@@ -23,13 +23,13 @@
         "query": "SELECT order_id FROM core.orders WHERE email = '{{ $node[\"Webhook Checkout\"].json.query?.email }}' AND payment_status ILIKE 'aprovado%' LIMIT 1;",
         "options": {}
       },
-      "id": "d299efa8-59a0-4f95-8e5d-f9f369237d46",
+      "id": "64daf43f-f4cd-43fb-9c50-f882b0631649",
       "name": "Verificar Compra Ativa",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -1648,
-        -720
+        -2432,
+        -768
       ],
       "credentials": {
         "postgres": {
@@ -60,13 +60,13 @@
         },
         "options": {}
       },
-      "id": "fd4c060e-21ee-481b-83f3-8125a767f607",
+      "id": "5bd50911-630f-4a53-be5b-f1de617271e2",
       "name": "Já é VIP?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -1424,
-        -720
+        -2208,
+        -768
       ]
     },
     {
@@ -89,13 +89,13 @@
           }
         }
       },
-      "id": "8559580c-eecf-45be-b7ea-48d74f1cfc06",
+      "id": "3a7aa33c-9c8a-4645-b3d4-9963bcf5361b",
       "name": "Resposta - Cliente Já Ativo",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -1200,
-        -816
+        -1984,
+        -864
       ]
     },
     {
@@ -110,16 +110,16 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício Sales Channel VIP\",\n      \"unit_price\": 1.15,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
+        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício Sales Channel VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
         "options": {}
       },
-      "id": "cf9c4634-d2aa-49ad-b72a-698b15f11b7d",
+      "id": "7910f077-8b48-42bb-858e-339e24570faf",
       "name": "Criar Preferência MP",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -1200,
-        -608
+        -1984,
+        -656
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -148,13 +148,13 @@
           }
         }
       },
-      "id": "bc9e6934-1119-406b-a83a-8f2b44b85703",
+      "id": "9ce6e3e0-ca8f-4ce4-9550-6a0eb6f80f1a",
       "name": "Resposta - URL Checkout",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -976,
-        -608
+        -1760,
+        -656
       ]
     }
   ],
@@ -215,9 +215,13 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "versionId": "572d2720-1f18-4243-b049-c6cda559ccf2",
+  "versionId": "c1ec40a2-9cbc-4eda-86c5-326ded1d75ce",
   "meta": {
     "instanceId": "52ece93edd8024eed03540d94f583084d91abce2d625f29e58c55c2eb2583682"
   },

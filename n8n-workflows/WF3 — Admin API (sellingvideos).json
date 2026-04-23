@@ -8,13 +8,13 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "8d5af705-5543-4020-8f2c-6082212245d5",
+      "id": "8d8c285e-575e-4ecb-8d32-eb14694c96a8",
       "name": "Webhook Admin",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1472,
-        -176
+        -1840,
+        -288
       ],
       "webhookId": "24aeddaf-16a0-438c-9bbc-72d174589650"
     },
@@ -42,13 +42,13 @@
         },
         "options": {}
       },
-      "id": "a6ee26b3-3e6b-449f-a849-fbfae425e0c2",
+      "id": "83235f2b-422d-4a9d-9d21-5d5042bbdd68",
       "name": "Verificar Admin Key",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -1264,
-        -176
+        -1632,
+        -288
       ]
     },
     {
@@ -65,13 +65,13 @@
           }
         }
       },
-      "id": "5d5a4f08-668a-4849-b39a-016be9586938",
+      "id": "cc034c7b-4181-4edb-8c09-85d4ebf93c3f",
       "name": "Resposta - Não Autorizado",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -1024,
-        -16
+        -1392,
+        -128
       ]
     },
     {
@@ -89,26 +89,26 @@
           ]
         }
       },
-      "id": "24d50b9d-e3f9-4f1b-bbcc-0273046edf11",
+      "id": "ce545ba0-2531-4e7c-a222-548180f31e2b",
       "name": "Roteador de Ações",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        -1024,
-        -224
+        -1392,
+        -336
       ]
     },
     {
       "parameters": {
         "jsCode": "const items = $input.all();\nif (!items || items.length === 0) return [];\nconst body = items[0].json.body || {};\nconst query = items[0].json.query || {};\nconst search = (query.search || body.search || '').toString().toLowerCase();\nconst paymentStatus = (query.payment_status || body.payment_status || '').toString().toLowerCase();\nconst orderStatus = (query.order_status || body.order_status || '').toString().toLowerCase();\nconst conditions = [];\nconst params = [];\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\nreturn [{ json: { sql, params } }];"
       },
-      "id": "227d8129-6ad7-44fe-bd61-04f12314739f",
+      "id": "bcdbe066-9e32-4432-8f8a-33f764a4e709",
       "name": "Montar Query de Listagem",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -816,
-        -384
+        -1184,
+        -496
       ]
     },
     {
@@ -117,13 +117,13 @@
         "query": "{{ $json.sql }}",
         "options": {}
       },
-      "id": "7127a860-f48e-40c2-973a-55a1d8a1c8b8",
+      "id": "05751fcd-3930-4126-b9c7-c3a6aa6d0de9",
       "name": "Consultar Pedidos PostgreSQL",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -592,
-        -384
+        -960,
+        -496
       ],
       "credentials": {
         "postgres": {
@@ -136,13 +136,13 @@
       "parameters": {
         "jsCode": "const orders = $input.all().map(i => i.json);\nreturn [{ json: { orders, total: orders.length } }];"
       },
-      "id": "b6eb55d0-9873-4a91-95fc-1665c1d476ea",
+      "id": "ba958427-a314-44bb-b17f-fa96e7b3e81b",
       "name": "Serializar Resposta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -368,
-        -384
+        -736,
+        -496
       ]
     },
     {
@@ -163,13 +163,13 @@
           }
         }
       },
-      "id": "cda7513e-5bd7-4ca1-b159-a20b8cb1de14",
+      "id": "fdb97fbc-f434-4347-a862-37767b84e450",
       "name": "Resposta - Lista de Pedidos",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -144,
-        -384
+        -512,
+        -496
       ]
     },
     {
@@ -178,13 +178,13 @@
         "query": "UPDATE core.orders\nSET\n  order_status = '{{ $(\"Webhook Admin\").item.json.body.order_status }}',\n  approved_at = CASE\n    WHEN '{{ $(\"Webhook Admin\").item.json.body.approved_at }}' <> ''\n    THEN '{{ $(\"Webhook Admin\").item.json.body.approved_at }}'::TIMESTAMPTZ\n    ELSE approved_at\n  END\nWHERE order_id = '{{ $(\"Webhook Admin\").item.json.body.order_id }}';",
         "options": {}
       },
-      "id": "04a082f0-3084-4356-b65d-b2378abcaab5",
+      "id": "7170cfbb-6386-49f7-ae23-99212f8fa124",
       "name": "Atualizar Status no PostgreSQL",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -816,
-        -224
+        -1184,
+        -336
       ],
       "credentials": {
         "postgres": {
@@ -211,13 +211,13 @@
           }
         }
       },
-      "id": "c3942b61-18a8-48dc-96f7-c872429818f8",
+      "id": "1610570b-a9b1-4e62-ba0e-72e5efb3a382",
       "name": "Resposta - Status Atualizado",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -592,
-        -224
+        -960,
+        -336
       ]
     },
     {
@@ -226,13 +226,13 @@
         "query": "UPDATE core.orders SET code_used_at = NULL WHERE order_id = '{{ $(\"Webhook Admin\").item.json.body.order_id }}' RETURNING *;",
         "options": {}
       },
-      "id": "4e5d5d81-ea19-418c-9452-410dc91d9629",
+      "id": "ba9e31d8-af8d-4db0-afda-7d2f2f8bd295",
       "name": "Resetar Uso no DB",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -816,
-        -64
+        -1184,
+        -176
       ],
       "credentials": {
         "postgres": {
@@ -264,13 +264,13 @@
         },
         "options": {}
       },
-      "id": "3742b813-1111-42e7-b6b1-7255a3eeff24",
+      "id": "09ef5fe5-f57d-43fb-9f8e-6f9fe58df7cc",
       "name": "Gerar Novo Link Manual",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -592,
-        -64
+        -960,
+        -176
       ]
     },
     {
@@ -291,13 +291,13 @@
           }
         }
       },
-      "id": "5fdf7865-a416-4f89-97c3-902ca8c92c0a",
+      "id": "c35dd4e1-1541-483e-b320-edafde86c6dd",
       "name": "Resposta - Link Gerado",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -368,
-        -64
+        -736,
+        -176
       ]
     }
   ],
@@ -427,9 +427,13 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "versionId": "8402ee61-be55-4900-8830-3f5ea3f21aed",
+  "versionId": "bba9c692-f9de-490b-ac29-a03ecbe2c1aa",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "52ece93edd8024eed03540d94f583084d91abce2d625f29e58c55c2eb2583682"

@@ -7,13 +7,13 @@
         "path": "mp-payment",
         "options": {}
       },
-      "id": "5df8e531-7200-4e55-bc75-5475dc00e37f",
+      "id": "6bd102e5-6e6c-46cb-b812-c852b382788c",
       "name": "Receber IPN Mercado Pago",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -8256,
-        -1792
+        -8400,
+        -2192
       ],
       "webhookId": "mp-payment-webhook"
     },
@@ -21,13 +21,13 @@
       "parameters": {
         "jsCode": "const raw = $json || {};\nconst body = raw.body || raw;\nconst headers = raw.headers || {};\nconst eventType = body?.type || body?.topic || '';\nlet resourceId = '';\nif (body?.data?.id) {\n  resourceId = String(body.data.id);\n} else if (body?.id) {\n  resourceId = String(body.id);\n} else if (body?.resource && typeof body.resource === 'string') {\n  const parts = body.resource.split('/');\n  resourceId = parts[parts.length - 1];\n}\nreturn [{ json: { body, headers, event_type: eventType, resource_id: resourceId, received_at: new Date().toISOString() } }];"
       },
-      "id": "4a920815-6a56-403b-a0b2-867252d94347",
+      "id": "a2b6cf9f-7977-4011-adc6-de8f4a546cff",
       "name": "Normalizar Webhook MP",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -8016,
-        -1792
+        -8160,
+        -2192
       ]
     },
     {
@@ -53,26 +53,26 @@
         },
         "options": {}
       },
-      "id": "3b86a94d-464d-4194-8bba-0fc8de7de199",
+      "id": "27ae0a17-4903-4131-8a0c-8ca9a024b4c8",
       "name": "Evento é Payment?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -7776,
-        -1792
+        -7920,
+        -2192
       ]
     },
     {
       "parameters": {
         "jsCode": "return [{ json: { payment_id: String($json.resource_id || ''), event_type: $json.event_type || '', body: $json.body || {}, headers: $json.headers || {} } }];"
       },
-      "id": "0637854a-2fa7-4d2c-8583-ead0627303bb",
+      "id": "8902e777-7a8a-4b0f-9175-00edd9b3b1ea",
       "name": "Preparar Payment ID Direto",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -7536,
-        -1904
+        -7680,
+        -2304
       ]
     },
     {
@@ -98,13 +98,13 @@
         },
         "options": {}
       },
-      "id": "f6d72f30-43a5-4d1c-a6eb-f058c952e702",
+      "id": "492a44fc-66ea-4411-815a-5402447f2038",
       "name": "Evento é Merchant Order?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -7536,
-        -1632
+        -7680,
+        -2032
       ]
     },
     {
@@ -114,13 +114,13 @@
         "genericAuthType": "httpHeaderAuth",
         "options": {}
       },
-      "id": "70aaf13b-8884-4904-ad81-1a732c7692ae",
+      "id": "6b6276e9-62d4-4736-94bb-0c6c6b61a391",
       "name": "Consultar Merchant Order MP",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -7296,
-        -1632
+        -7440,
+        -2032
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -133,13 +133,13 @@
       "parameters": {
         "jsCode": "const merchantOrder = $input.first().json || {};\nconst payments = Array.isArray(merchantOrder.payments) ? merchantOrder.payments : [];\nconst approvedPayment = payments.find(p => p.status === 'approved');\nconst preferredPayment = approvedPayment || payments[payments.length - 1] || {};\nconst paymentId = preferredPayment.id ? String(preferredPayment.id) : '';\nreturn [{ json: { merchant_order_id: String(merchantOrder.id || ''), payment_id: paymentId, has_payment: !!paymentId } }];"
       },
-      "id": "f2fcf113-e93a-4cd9-8458-6b2470f79746",
+      "id": "c22fcae8-6d20-4aba-bfa2-1a22ddca5f08",
       "name": "Extrair Payment ID Merchant Order",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -7056,
-        -1632
+        -7200,
+        -2032
       ]
     },
     {
@@ -164,13 +164,13 @@
         },
         "options": {}
       },
-      "id": "8c2e68c9-cc95-4200-9575-504215f9ff31",
+      "id": "ec5dc0c1-afeb-452a-8526-84f8e6df65ca",
       "name": "Tem Payment ID?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -6816,
-        -1792
+        -6960,
+        -2192
       ]
     },
     {
@@ -180,13 +180,13 @@
         "genericAuthType": "httpHeaderAuth",
         "options": {}
       },
-      "id": "18171958-c9b4-40c1-b952-09991c5a29dc",
+      "id": "5ad772e9-8a26-406b-8a8c-ee49426ce64a",
       "name": "Consultar Pagamento MP",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        -6576,
-        -1792
+        -6720,
+        -2192
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -218,13 +218,13 @@
         },
         "options": {}
       },
-      "id": "40013a2d-2b12-4206-99fe-4ec22dea2d86",
+      "id": "e9e5d13f-7587-49cf-828b-ead1fea38811",
       "name": "Status Aprovado?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -6336,
-        -1888
+        -6480,
+        -2288
       ]
     },
     {
@@ -259,26 +259,26 @@
         },
         "options": {}
       },
-      "id": "05465ad2-122b-46e0-af66-b0039bb4d226",
+      "id": "b2964fc2-f31f-4ae5-bb40-df9a365cc4f4",
       "name": "Status Pendente/Processando?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -6336,
-        -1648
+        -6480,
+        -2048
       ]
     },
     {
       "parameters": {
         "jsCode": "const payment = $input.first().json;\nconst meta = payment.metadata || {};\nconst payer = payment.payer || {};\nconst name = payer.first_name ? `${payer.first_name} ${payer.last_name || ''}`.trim() : (meta.name || 'Cliente');\nconst status = payment.status || 'pending';\nconst isApproved = status === 'approved';\n\n// Captura ultra-robusta de e-mail\nconst email = (\n  meta.email || \n  payer.email || \n  (payment.additional_info && payment.additional_info.payer && payment.additional_info.payer.email) || \n  ''\n).toString().trim();\n\nlet inviteCode = null;\nif (isApproved) {\n  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';\n  inviteCode = 'SV-';\n  for (let i = 0; i < 6; i++) { inviteCode += chars.charAt(Math.floor(Math.random() * chars.length)); }\n}\nreturn [{ json: { order_id: payment.id?.toString(), payment_id: payment.id?.toString(), name: name.toString(), email, price: Number(payment.transaction_amount || 0), payment_status: isApproved ? 'aprovado' : 'pendente', order_status: 'novo', invite_code: inviteCode, created_at: payment.date_created, approved_at: isApproved ? payment.date_approved : null } }];"
       },
-      "id": "5a40d556-75fa-4b5b-a866-cc5e91555857",
+      "id": "45d70ffb-9742-49b5-9712-106a267cdb66",
       "name": "Montar Objeto do Pedido",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -6096,
-        -1888
+        -6240,
+        -2288
       ]
     },
     {
@@ -287,13 +287,13 @@
         "query": "INSERT INTO core.orders (\n  order_id, name, email, price, payment_status, invite_code, created_at, order_status, log_email\n) VALUES (\n  '{{$json.order_id}}', \n  '{{$json.name}}', \n  '{{$json.email}}', \n  {{$json.price}}, \n  '{{$json.payment_status}}', \n  NULLIF('{{$json.invite_code}}', 'null'), \n  '{{$json.created_at}}', \n  '{{$json.order_status}}', \n  ''\n) \nON CONFLICT (order_id) \nDO UPDATE SET \n  payment_status = EXCLUDED.payment_status,\n  invite_code = COALESCE(NULLIF(core.orders.invite_code, 'null'), EXCLUDED.invite_code),\n  order_status = COALESCE(core.orders.order_status, EXCLUDED.order_status);",
         "options": {}
       },
-      "id": "1ab40895-f1be-43a2-a5f9-b2652a4b8aaa",
+      "id": "79014dc2-e5f1-4d17-8a58-719d82c6ddf4",
       "name": "Gravar Pedido no PostgreSQL",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -5856,
-        -1792
+        -6000,
+        -2192
       ],
       "credentials": {
         "postgres": {
@@ -308,13 +308,13 @@
         "query": "SELECT log_email FROM core.orders WHERE order_id = '{{ $json.order_id }}' LIMIT 1;",
         "options": {}
       },
-      "id": "20f893a0-f2be-4f7a-897e-5b310aea14c6",
+      "id": "9233fba0-c73b-49c0-96b1-11590156bfe5",
       "name": "Consultar Estado Envio",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -5616,
-        -1792
+        -5760,
+        -2192
       ],
       "credentials": {
         "postgres": {
@@ -355,13 +355,13 @@
         },
         "options": {}
       },
-      "id": "d2eb83d5-874f-4aa0-80cf-af88c1cebbd9",
+      "id": "4810ed68-c15c-4838-bae5-1d029512129c",
       "name": "Enviar VIP?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -5376,
-        -1872
+        -5520,
+        -2272
       ]
     },
     {
@@ -395,13 +395,13 @@
         },
         "options": {}
       },
-      "id": "fd9f040f-1474-45b0-a61c-547ab51adbe6",
+      "id": "ebe37fce-b8c6-4eab-b713-caec311696e1",
       "name": "Enviar Pendente?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -5376,
-        -1632
+        -5520,
+        -2032
       ]
     },
     {
@@ -410,13 +410,13 @@
         "query": "UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = '{{ $node['Montar Objeto do Pedido'].json.order_id }}' AND (log_email IS NULL OR log_email != 'VIP_ENVIADO') RETURNING *;",
         "options": {}
       },
-      "id": "e54a95b1-485d-4adc-ac49-66ee225b6147",
+      "id": "47cb0ae6-6339-424f-a423-62fde17b9c8d",
       "name": "Marcar VIP (Trava)",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -5120,
-        -1920
+        -5264,
+        -2320
       ],
       "credentials": {
         "postgres": {
@@ -447,13 +447,13 @@
         },
         "options": {}
       },
-      "id": "8b306416-6a3e-4557-b11a-6e475ee589c7",
+      "id": "2e464834-0807-4d24-b41e-2b3844ba5089",
       "name": "Bloqueou VIP?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -4896,
-        -1920
+        -5040,
+        -2320
       ]
     },
     {
@@ -465,13 +465,13 @@
         "html": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">  <h2>Seu pagamento foi confirmado!</h2>  <p>Olá <b>{{ $node['Montar Objeto do Pedido'].json.name }}</b>,</p>  <p>O seu pedido <b>#{{ $node['Montar Objeto do Pedido'].json.order_id }}</b> foi aprovado e o seu acesso vitalício está liberado.</p>  <p>Para entrar no canal VIP e ativar seu acesso aos vídeos, clique no botão abaixo:</p>  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\">      <a href=\"https://t.me/divulgaVovo_bot?start={{ $node['Montar Objeto do Pedido'].json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">Ativar Acesso Agora</a>    </td></tr>  </table>  <p>Seu código exclusivo de ativação é: <b>{{ $node['Montar Objeto do Pedido'].json.invite_code }}</b></p>  <p>Você será direcionado ao nosso robô do Telegram que irá validar seu pedido e te entregará o link único do canal.</p>  <p>Qualquer problema entre em contato respondendo este e-mail.</p>  <p>Sales Channel agradece sua compra!</p></div>",
         "options": {}
       },
-      "id": "33053975-5ce3-480b-8ba5-40d7c43cfc95",
+      "id": "f73c8643-94ec-482c-ae34-384644ae1ee8",
       "name": "Email VIP",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        -4672,
-        -1920
+        -4816,
+        -2320
       ],
       "webhookId": "d6f5de3e-af20-4a84-a0d5-67b486aae8ca",
       "credentials": {
@@ -490,13 +490,13 @@
         "html": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\"><h2>Pedido Recebido!</h2><p>Olá <b>{{ $node['Montar Objeto do Pedido'].json.name }}</b>,</p> <p>Recebemos seu pedido <b>#{{ $node['Montar Objeto do Pedido'].json.order_id }}</b> e estamos aguardando a confirmação do pagamento.</p>  <p>Assim que for aprovado, você receberá um novo e-mail com o link de acesso ao Telegram VIP.</p><p>Para pagamentos com Pix ou Cartão a aprovação ocorre de forma muito rápida.</p><p>Equipe Sales Channel.</p></div>",
         "options": {}
       },
-      "id": "38a76cd9-f420-4aa6-b95b-2a867d72db06",
+      "id": "37822afe-772a-4d6a-9a1c-9835685e3ec7",
       "name": "Email Pedido Recebido",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        -5120,
-        -1648
+        -5264,
+        -2048
       ],
       "webhookId": "e51c3383-e704-450e-a504-b1529615125c",
       "credentials": {
@@ -512,13 +512,13 @@
         "query": "UPDATE core.orders SET log_email = 'PENDENTE_ENVIADO' WHERE order_id = '{{ $node['Montar Objeto do Pedido'].json.order_id }}';",
         "options": {}
       },
-      "id": "031b4e88-d7b7-4b32-a63f-35661d97d789",
+      "id": "dba22dbd-c639-4c9b-a159-17d87fb3fa25",
       "name": "Marcar Pendente",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        -4896,
-        -1648
+        -5040,
+        -2048
       ],
       "credentials": {
         "postgres": {
@@ -536,13 +536,13 @@
         "html": "Relatório de venda Sales Channel - Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}",
         "options": {}
       },
-      "id": "7205535b-77b5-4742-ae94-3b98f620d6af",
+      "id": "b795a68d-7a4e-46e6-b882-ed75096b1706",
       "name": "Relatório Admin",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        -4416,
-        -1824
+        -4560,
+        -2224
       ],
       "webhookId": "6d4ff747-4915-42a9-bfab-9fde1a273444",
       "credentials": {
@@ -809,9 +809,13 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "versionId": "9511642e-411f-462e-80fc-baee875012a8",
+  "versionId": "e3fb5d07-eb62-48af-a9b0-cd7c4db5c33c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "52ece93edd8024eed03540d94f583084d91abce2d625f29e58c55c2eb2583682"
