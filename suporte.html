@@ -297,7 +297,7 @@
             ✅ <b>Sua solicitação foi enviada!</b> Em até 24h nossa equipe entrará em contato via e-mail.
         </div>
         <div id="feedback-error" class="feedback error">
-            ❌ <b>Erro no envio.</b> Por favor, tente novamente ou fale conosco em <b>admin@saleschannel.com.br</b>.
+            ❌ <b>Erro no envio.</b> Por favor, tente novamente ou fale conosco em <a href="mailto:admin@saleschannel.com.br" onclick="copyEmail(event, this)" style="color: #fff; text-decoration: underline; cursor: pointer;"><b>admin@saleschannel.com.br</b></a>.
         </div>
 
         <form id="supportForm">
@@ -407,6 +407,16 @@
                 btn.textContent = '🚀 Enviar Solicitação';
             }
         });
+
+        function copyEmail(e, el) {
+            navigator.clipboard.writeText('admin@saleschannel.com.br').then(() => {
+                const originalHTML = el.innerHTML;
+                el.innerHTML = '<b>E-mail copiado!</b>';
+                setTimeout(() => {
+                    el.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => console.error('Erro ao copiar', err));
+        }
     </script>
 </body>
 
