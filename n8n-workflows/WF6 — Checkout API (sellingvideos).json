@@ -19,9 +19,24 @@
     },
     {
       "parameters": {
+        "jsCode": "const email = $node[\"Webhook Checkout\"].json.query?.email || '';\nconst regex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nif (!regex.test(email)) {\n  throw new Error('E-mail inválido');\n}\nreturn { email };"
+      },
+      "id": "email-val-node",
+      "name": "Validar E-mail",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2550,
+        -768
+      ]
+    },
+    {
+      "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT order_id FROM core.orders WHERE email = '{{ $node[\"Webhook Checkout\"].json.query?.email }}' AND payment_status ILIKE 'aprovado%' LIMIT 1;",
-        "options": {}
+        "query": "SELECT order_id FROM core.orders WHERE email = $1 AND payment_status ILIKE 'aprovado%' LIMIT 1;",
+        "options": {
+          "queryParams": "={{ $node[\"Validar E-mail\"].json.email }}"
+        }
       },
       "id": "64daf43f-f4cd-43fb-9c50-f882b0631649",
       "name": "Verificar Compra Ativa",
@@ -83,7 +98,7 @@
               },
               {
                 "name": "Access-Control-Allow-Origin",
-                "value": "*"
+                "value": "https://saleschannel.com.br"
               }
             ]
           }
@@ -110,7 +125,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício Sales Channel VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email || 'comprador@teste.com' }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node['Webhook Checkout'].json.query?.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
+        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício Sales Channel VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node['Validar E-mail'].json.email }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node['Validar E-mail'].json.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
         "options": {}
       },
       "id": "7910f077-8b48-42bb-858e-339e24570faf",
@@ -142,7 +157,7 @@
               },
               {
                 "name": "Access-Control-Allow-Origin",
-                "value": "*"
+                "value": "https://saleschannel.com.br"
               }
             ]
           }
@@ -161,6 +176,17 @@
   "pinData": {},
   "connections": {
     "Webhook Checkout": {
+      "main": [
+        [
+          {
+            "node": "Validar E-mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar E-mail": {
       "main": [
         [
           {
