@@ -309,7 +309,7 @@
         "operation": "executeQuery",
         "query": "SELECT log_email FROM core.orders WHERE order_id = $1 LIMIT 1;",
         "options": {
-          "queryParams": "={{ $json.order_id }}"
+          "queryParams": "={{ [ $json.order_id ] }}"
         }
       },
       "id": "9233fba0-c73b-49c0-96b1-11590156bfe5",
@@ -413,7 +413,7 @@
         "operation": "executeQuery",
         "query": "UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = $1 AND (log_email IS NULL OR log_email != 'VIP_ENVIADO') RETURNING *;",
         "options": {
-          "queryParams": "={{ $node['Montar Objeto do Pedido'].json.order_id }}"
+          "queryParams": "={{ [ $node['Montar Objeto do Pedido'].json.order_id ] }}"
         }
       },
       "id": "47cb0ae6-6339-424f-a423-62fde17b9c8d",
@@ -517,7 +517,7 @@
         "operation": "executeQuery",
         "query": "UPDATE core.orders SET log_email = 'PENDENTE_ENVIADO' WHERE order_id = $1;",
         "options": {
-          "queryParams": "={{ $node['Montar Objeto do Pedido'].json.order_id }}"
+          "queryParams": "={{ [ $node['Montar Objeto do Pedido'].json.order_id ] }}"
         }
       },
       "id": "dba22dbd-c639-4c9b-a159-17d87fb3fa25",

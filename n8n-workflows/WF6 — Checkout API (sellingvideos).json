@@ -35,7 +35,7 @@
         "operation": "executeQuery",
         "query": "SELECT order_id FROM core.orders WHERE email = $1 AND payment_status ILIKE 'aprovado%' LIMIT 1;",
         "options": {
-          "queryParams": "={{ $node[\"Validar E-mail\"].json.email }}"
+          "queryParams": "={{ [ $node[\"Validar E-mail\"].json.email ] }}"
         }
       },
       "id": "64daf43f-f4cd-43fb-9c50-f882b0631649",
