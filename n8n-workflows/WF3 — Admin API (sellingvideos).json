@@ -234,10 +234,23 @@
     },
     {
       "parameters": {
+        "jsCode": "const orderId = $json.body.order_id;\nreturn [{\n  json: {\n    sql: \"UPDATE core.orders SET code_used_at = NULL WHERE order_id = $1 RETURNING *;\",\n    params: [ orderId ]\n  }\n}];"
+      },
+      "id": "prepare-reset-node",
+      "name": "Preparar Query Reset",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        -176
+      ]
+    },
+    {
+      "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE core.orders SET code_used_at = NULL WHERE order_id = $1 RETURNING *;",
+        "query": "={{ $json.sql }}",
         "options": {
-          "queryParams": "={{ [ $json.body.order_id ] }}"
+          "queryParams": "={{ $json.params }}"
         }
       },
       "alwaysOutputData": true,
@@ -364,6 +377,17 @@
             "index": 0
           }
         ],
+        [
+          {
+            "node": "Preparar Query Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Query Reset": {
+      "main": [
         [
           {
             "node": "Resetar Uso no DB",
