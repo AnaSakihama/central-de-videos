@@ -77,17 +77,23 @@
     {
       "parameters": {
         "dataType": "string",
+        "value1": "={{ $json.body.action }}",
         "rules": {
           "rules": [
-            {},
             {
+              "value2": "listar_pedidos"
+            },
+            {
+              "value2": "atualizar_status",
               "output": 1
             },
             {
+              "value2": "redefinir_acesso",
               "output": 2
             }
           ]
-        }
+        },
+        "fallbackOutput": 0
       },
       "id": "ce545ba0-2531-4e7c-a222-548180f31e2b",
       "name": "Roteador de Ações",
