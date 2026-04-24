@@ -299,15 +299,24 @@ async function resetAccess(orderId) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     
-    if (data.invite_link) {
+    // A API do Telegram retorna { ok: true, result: { invite_link: "..." } }
+    // O n8n pode repassar o objeto direto ou aninhado em result
+    const inviteLink = data.invite_link
+      || data.result?.invite_link
+      || (Array.isArray(data) && data[0]?.invite_link)
+      || (Array.isArray(data) && data[0]?.result?.invite_link);
+
+    if (inviteLink) {
       const resultDiv = document.getElementById('resetResult');
       const input = document.getElementById('newInviteLink');
-      input.value = data.invite_link;
+      input.value = inviteLink;
       resultDiv.style.display = 'block';
       btn.textContent = '✅ Sucesso!';
       setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
     } else {
-      throw new Error('Link não retornado pela API');
+      // Log para debug — exibe o objeto raw no console para diagnóstico
+      console.error('Resposta da API (debug):', JSON.stringify(data));
+      throw new Error('Link não retornado pela API. Verifique o console (F12) para detalhes.');
     }
   } catch (err) {
     alert('Erro ao redefinir acesso: ' + err.message);
