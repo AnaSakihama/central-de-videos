@@ -234,7 +234,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const orderId = $json.body.order_id;\nreturn [{\n  json: {\n    sql: \"UPDATE core.orders SET code_used_at = NULL WHERE order_id = $1 RETURNING *;\",\n    params: [ orderId ]\n  }\n}];"
+        "jsCode": "const orderId = ($json.body.order_id || '').toString().replace(/[^0-9]/g, '');\nreturn [{\n  json: {\n    sql: `UPDATE core.orders SET code_used_at = NULL WHERE order_id = '${orderId}' RETURNING *;`\n  }\n}];"
       },
       "id": "prepare-reset-node",
       "name": "Preparar Query Reset",
@@ -249,9 +249,7 @@
       "parameters": {
         "operation": "executeQuery",
         "query": "={{ $json.sql }}",
-        "options": {
-          "queryParams": "={{ $json.params }}"
-        }
+        "options": {}
       },
       "alwaysOutputData": true,
       "id": "ba9e31d8-af8d-4db0-afda-7d2f2f8bd295",
