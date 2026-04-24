@@ -315,8 +315,11 @@ async function resetAccess(orderId) {
       })
     });
     
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const text = await res.text();
+    console.log('Resposta bruta (debug):', text);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
+    const data = JSON.parse(text);
     
     // A API do Telegram retorna { ok: true, result: { invite_link: "..." } }
     // O n8n pode repassar o objeto direto ou aninhado em result
