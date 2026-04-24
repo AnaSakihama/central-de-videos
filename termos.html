@@ -270,7 +270,7 @@
                 através de:
             </p>
             <ul>
-                <li>📧 E-mail: <a href="mailto:admin@saleschannel.com.br">admin@saleschannel.com.br</a></li>
+                <li>📧 E-mail: <a href="mailto:admin@saleschannel.com.br" onclick="copyEmail(event, this)">admin@saleschannel.com.br</a></li>
                 <li>💬 Formulário: <a href="suporte.html">Central de Suporte</a></li>
             </ul>
         </div>
@@ -287,6 +287,17 @@
         </div>
     </footer>
 
+    <script>
+        function copyEmail(e, el) {
+            navigator.clipboard.writeText('admin@saleschannel.com.br').then(() => {
+                const originalText = el.innerText;
+                el.innerText = 'E-mail copiado!';
+                setTimeout(() => {
+                    el.innerText = originalText;
+                }, 2000);
+            }).catch(err => console.error('Erro ao copiar', err));
+        }
+    </script>
 </body>
 
 </html>
