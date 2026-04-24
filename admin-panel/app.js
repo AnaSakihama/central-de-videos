@@ -4,7 +4,7 @@
 // ─────────────────────────────────────────────
 
 const API_BASE = 'https://n8n.saleschannel.com.br/webhook/admin'; // Endpoint único do WF3
-let adminKey = localStorage.getItem('sc_admin_key') || '';
+let adminKey = sessionStorage.getItem('sc_admin_key') || '';
 let allOrders = [];
 
 // ── Init ──────────────────────────────────────
@@ -41,7 +41,7 @@ function switchView(viewName) {
 // ── Admin Key ─────────────────────────────────
 function saveKey() {
   adminKey = document.getElementById('adminKey').value.trim();
-  localStorage.setItem('sc_admin_key', adminKey);
+  sessionStorage.setItem('sc_admin_key', adminKey);
   loadOrders();
 }
 
@@ -318,9 +318,14 @@ async function resetAccess(orderId) {
 
 function copyNewLink() {
   const input = document.getElementById('newInviteLink');
-  input.select();
-  document.execCommand('copy');
-  alert('Link copiado para a área de transferência!');
+  navigator.clipboard.writeText(input.value).then(() => {
+    alert('Link copiado para a área de transferência!');
+  }).catch(() => {
+    // Fallback para navegadores antigos
+    input.select();
+    document.execCommand('copy');
+    alert('Link copiado!');
+  });
 }
 
 // ── Loading / Error states ─────────────────────
