@@ -125,6 +125,7 @@
           "queryParams": "={{ $json.params }}"
         }
       },
+      "alwaysOutputData": true,
       "id": "05751fcd-3930-4126-b9c7-c3a6aa6d0de9",
       "name": "Consultar Pedidos PostgreSQL",
       "type": "n8n-nodes-base.postgres",
@@ -165,7 +166,7 @@
               },
               {
                 "name": "Access-Control-Allow-Origin",
-                "value": "https://saleschannel.com.br"
+                "value": "*"
               }
             ]
           }
@@ -185,9 +186,10 @@
         "operation": "executeQuery",
         "query": "UPDATE core.orders SET order_status = $1, approved_at = CASE WHEN $2 <> '' THEN $2::TIMESTAMPTZ ELSE approved_at END WHERE order_id = $3;",
         "options": {
-          "queryParams": "={{ [ $(\"Webhook Admin\").item.json.body.order_status, $(\"Webhook Admin\").item.json.body.approved_at || '', $(\"Webhook Admin\").item.json.body.order_id ] }}"
+          "queryParams": "={{ [ $json.body.order_status, $json.body.approved_at || '', $json.body.order_id ] }}"
         }
       },
+      "alwaysOutputData": true,
       "id": "7170cfbb-6386-49f7-ae23-99212f8fa124",
       "name": "Atualizar Status no PostgreSQL",
       "type": "n8n-nodes-base.postgres",
@@ -215,7 +217,7 @@
               },
               {
                 "name": "Access-Control-Allow-Origin",
-                "value": "https://saleschannel.com.br"
+                "value": "*"
               }
             ]
           }
@@ -235,9 +237,10 @@
         "operation": "executeQuery",
         "query": "UPDATE core.orders SET code_used_at = NULL WHERE order_id = $1 RETURNING *;",
         "options": {
-          "queryParams": "={{ [ $(\"Webhook Admin\").item.json.body.order_id ] }}"
+          "queryParams": "={{ [ $json.body.order_id ] }}"
         }
       },
+      "alwaysOutputData": true,
       "id": "ba9e31d8-af8d-4db0-afda-7d2f2f8bd295",
       "name": "Resetar Uso no DB",
       "type": "n8n-nodes-base.postgres",
@@ -276,6 +279,7 @@
         },
         "options": {}
       },
+      "alwaysOutputData": true,
       "id": "09ef5fe5-f57d-43fb-9f8e-6f9fe58df7cc",
       "name": "Gerar Novo Link Manual",
       "type": "n8n-nodes-base.httpRequest",
@@ -297,7 +301,7 @@
               },
               {
                 "name": "Access-Control-Allow-Origin",
-                "value": "https://saleschannel.com.br"
+                "value": "*"
               }
             ]
           }
