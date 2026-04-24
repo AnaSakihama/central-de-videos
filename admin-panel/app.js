@@ -54,6 +54,15 @@ function getHeaders() {
 
 // ── Load Orders ───────────────────────────────
 async function loadOrders() {
+  // Verificar se a Admin Key foi informada
+  if (!adminKey) {
+    const msg = '🔑 Informe a Admin Key na sidebar e clique "Salvar" para acessar os dados.';
+    setTableError('recentTable', msg);
+    setTableError('ordersTable', msg);
+    setTableError('pendingTable', msg);
+    return;
+  }
+
   try {
     setTableLoading('recentTable');
     setTableLoading('ordersTable');
@@ -65,6 +74,16 @@ async function loadOrders() {
       headers: getHeaders(),
       body: JSON.stringify({ action: 'listar_pedidos' })
     });
+
+    // Erro de autenticação
+    if (res.status === 401) {
+      const msg = '🔒 Admin Key incorreta. Verifique e clique em "Salvar" novamente.';
+      setTableError('recentTable', msg);
+      setTableError('ordersTable', msg);
+      setTableError('pendingTable', msg);
+      return;
+    }
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     allOrders = Array.isArray(data) ? data : (data.orders || []);
