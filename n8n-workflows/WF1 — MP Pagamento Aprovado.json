@@ -284,10 +284,8 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at, order_status, log_email) VALUES ($1, $2, $3, $4, $5, NULLIF($6, 'null'), $7, $8, '') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status, invite_code = COALESCE(NULLIF(core.orders.invite_code, 'null'), EXCLUDED.invite_code), order_status = COALESCE(core.orders.order_status, EXCLUDED.order_status);",
-        "options": {
-          "queryParams": "={{ [$json.order_id, $json.name, $json.email, $json.price, $json.payment_status, $json.invite_code || 'null', $json.created_at, $json.order_status] }}"
-        }
+        "query": "={{ `INSERT INTO core.orders (order_id, name, email, price, payment_status, invite_code, created_at, order_status, log_email) VALUES ('${$json.order_id}', '${($json.name||'').replace(/'/g,\"''\")}', '${($json.email||'').replace(/'/g,\"''\")}', ${$json.price}, '${$json.payment_status}', ${$json.invite_code ? `'${$json.invite_code}'` : 'NULL'}, '${$json.created_at}', '${$json.order_status}', '') ON CONFLICT (order_id) DO UPDATE SET payment_status = EXCLUDED.payment_status, invite_code = COALESCE(NULLIF(core.orders.invite_code, 'null'), EXCLUDED.invite_code), order_status = COALESCE(core.orders.order_status, EXCLUDED.order_status);` }}",
+        "options": {}
       },
       "id": "79014dc2-e5f1-4d17-8a58-719d82c6ddf4",
       "name": "Gravar Pedido no PostgreSQL",
@@ -307,10 +305,8 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT log_email FROM core.orders WHERE order_id = $1 LIMIT 1;",
-        "options": {
-          "queryParams": "={{ [ $json.order_id ] }}"
-        }
+        "query": "={{ `SELECT log_email FROM core.orders WHERE order_id = '${$json.order_id}' LIMIT 1;` }}",
+        "options": {}
       },
       "id": "9233fba0-c73b-49c0-96b1-11590156bfe5",
       "name": "Consultar Estado Envio",
@@ -411,10 +407,8 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = $1 AND (log_email IS NULL OR log_email != 'VIP_ENVIADO') RETURNING *;",
-        "options": {
-          "queryParams": "={{ [ $node['Montar Objeto do Pedido'].json.order_id ] }}"
-        }
+        "query": "={{ `UPDATE core.orders SET log_email = 'VIP_ENVIADO' WHERE order_id = '${$node['Montar Objeto do Pedido'].json.order_id}' AND (log_email IS NULL OR log_email != 'VIP_ENVIADO') RETURNING *;` }}",
+        "options": {}
       },
       "id": "47cb0ae6-6339-424f-a423-62fde17b9c8d",
       "name": "Marcar VIP (Trava)",
@@ -515,10 +509,8 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE core.orders SET log_email = 'PENDENTE_ENVIADO' WHERE order_id = $1;",
-        "options": {
-          "queryParams": "={{ [ $node['Montar Objeto do Pedido'].json.order_id ] }}"
-        }
+        "query": "={{ `UPDATE core.orders SET log_email = 'PENDENTE_ENVIADO' WHERE order_id = '${$node['Montar Objeto do Pedido'].json.order_id}';` }}",
+        "options": {}
       },
       "id": "dba22dbd-c639-4c9b-a159-17d87fb3fa25",
       "name": "Marcar Pendente",

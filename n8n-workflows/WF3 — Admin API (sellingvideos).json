@@ -106,7 +106,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nif (!items || items.length === 0) return [];\nconst body = items[0].json.body || {};\nconst query = items[0].json.query || {};\nconst search = (query.search || body.search || '').toString().toLowerCase();\nconst paymentStatus = (query.payment_status || body.payment_status || '').toString().toLowerCase();\nconst orderStatus = (query.order_status || body.order_status || '').toString().toLowerCase();\nconst conditions = [];\nconst params = [];\nif (search) {\n  params.push(`%${search}%`);\n  const p = params.length;\n  conditions.push(`(LOWER(email) LIKE $${p} OR LOWER(telegram_username) LIKE $${p} OR LOWER(name) LIKE $${p})`);\n}\nif (paymentStatus) {\n  params.push(paymentStatus);\n  conditions.push(`LOWER(payment_status) = $${params.length}`);\n}\nif (orderStatus) {\n  params.push(orderStatus);\n  conditions.push(`LOWER(order_status) = $${params.length}`);\n}\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\nreturn [{ json: { sql, params } }];"
+        "jsCode": "const items = $input.all();\nif (!items || items.length === 0) return [];\nconst body = items[0].json.body || {};\nconst query = items[0].json.query || {};\nconst search = (query.search || body.search || '').toString().toLowerCase().replace(/'/g, \"''\");\nconst paymentStatus = (query.payment_status || body.payment_status || '').toString().toLowerCase().replace(/'/g, \"''\");\nconst orderStatus = (query.order_status || body.order_status || '').toString().toLowerCase().replace(/'/g, \"''\");\nconst conditions = [];\nif (search) {\n  conditions.push(`(LOWER(email) LIKE '%${search}%' OR LOWER(telegram_username) LIKE '%${search}%' OR LOWER(name) LIKE '%${search}%')`);\n}\nif (paymentStatus) {\n  conditions.push(`LOWER(payment_status) = '${paymentStatus}'`);\n}\nif (orderStatus) {\n  conditions.push(`LOWER(order_status) = '${orderStatus}'`);\n}\nconst where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';\nconst sql = `SELECT * FROM core.orders ${where} ORDER BY created_at DESC`;\nreturn [{ json: { sql } }];"
       },
       "id": "bcdbe066-9e32-4432-8f8a-33f764a4e709",
       "name": "Montar Query de Listagem",
@@ -120,10 +120,8 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "{{ $json.sql }}",
-        "options": {
-          "queryParams": "={{ $json.params }}"
-        }
+        "query": "={{ $json.sql }}",
+        "options": {}
       },
       "alwaysOutputData": true,
       "id": "05751fcd-3930-4126-b9c7-c3a6aa6d0de9",
@@ -184,10 +182,8 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE core.orders SET order_status = $1, approved_at = CASE WHEN $2 <> '' THEN $2::TIMESTAMPTZ ELSE approved_at END WHERE order_id = $3;",
-        "options": {
-          "queryParams": "={{ [ $json.body.order_status, $json.body.approved_at || '', $json.body.order_id ] }}"
-        }
+        "query": "={{ `UPDATE core.orders SET order_status = '${($json.body.order_status||'').replace(/'/g,\"''\")}', approved_at = ${$json.body.approved_at ? `'${$json.body.approved_at}'::TIMESTAMPTZ` : 'approved_at'} WHERE order_id = '${($json.body.order_id||'').toString().replace(/[^0-9]/g,'')}';` }}",
+        "options": {}
       },
       "alwaysOutputData": true,
       "id": "7170cfbb-6386-49f7-ae23-99212f8fa124",
