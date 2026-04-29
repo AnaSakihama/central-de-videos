@@ -452,7 +452,8 @@
             }
         }
 
-        document.getElementById('btn-hero').addEventListener('click', handlePurchaseClick);
+        const btnHero = document.getElementById('btn-hero');
+        if (btnHero) btnHero.addEventListener('click', handlePurchaseClick);
         document.getElementById('btn-cta-final').addEventListener('click', handlePurchaseClick);
     </script>
 
@@ -499,5 +500,7 @@
                 transform: rotate(360deg);
             }
         }
+    </style>
 
-        </script></body></html>
+</body>
+</html>
