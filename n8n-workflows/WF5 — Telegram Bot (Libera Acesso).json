@@ -63,7 +63,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ `SELECT order_id, name, email FROM core.orders WHERE UPPER(TRIM(invite_code)) = UPPER(TRIM('${$json.code || ''}')) AND code_used_at IS NULL LIMIT 1;` }}",
+        "query": "={{ `SELECT order_id, name, email FROM core.orders WHERE UPPER(TRIM(invite_code)) = UPPER(TRIM('${($json.code||'').replace(/\\/g,'\\\\').replace(/'/g,\"''\")}')) AND code_used_at IS NULL LIMIT 1;` }}",
         "options": {}
       },
       "id": "00a66350-ea49-40f2-9943-ead502a43367",
@@ -184,7 +184,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ `UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE order_id = ${$('Validar Código no DB').item.json.order_id};` }}",
+        "query": "={{ `UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE order_id = '${($('Validar C\u00f3digo no DB').item.json.order_id||'').replace(/\\/g,'\\\\').replace(/'/g,\"''\")}';` }}",
         "options": {}
       },
       "id": "b9ab74fa-db06-4549-8140-1f8db7438f2f",

@@ -33,7 +33,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ `SELECT order_id FROM core.orders WHERE email = '${$node[\"Validar E-mail\"].json.email}' AND payment_status ILIKE 'aprovado%' LIMIT 1;` }}",
+        "query": "={{ `SELECT order_id FROM core.orders WHERE email = '${($node[\"Validar E-mail\"].json.email||'').replace(/\\\\/g,'\\\\\\\\').replace(/'/g,\"''\")}' AND payment_status ILIKE 'aprovado%' LIMIT 1;` }}",
         "options": {}
       },
       "id": "64daf43f-f4cd-43fb-9c50-f882b0631649",
