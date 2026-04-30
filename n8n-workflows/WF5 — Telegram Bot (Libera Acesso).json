@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || body.message?.chat?.id || null;\nconst userId = msg.from?.id || null;\nconst chatType = msg.chat?.type || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nif (text) {\n  const match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\n  if (match && match[1]) {\n    code = match[1].trim().toUpperCase();\n  }\n}\n\nreturn [{\n  json: {\n    code,\n    chat_id: chatId,\n    user_id: userId,\n    chat_type: chatType,\n    first_name: firstName,\n    raw_text: text\n  }\n}];"
+        "jsCode": "const body = $input.first().json.body || {};\nconst msg = body.message || $input.first().json.message || {};\n\n// Ignorar eventos que nao sao mensagens de texto (left_chat_member, new_chat_member, etc.)\nif (!msg.text || !msg.chat?.id) {\n  return [];\n}\n\nconst text = msg.text || '';\nconst chatId = msg.chat?.id || null;\nconst userId = msg.from?.id || null;\nconst chatType = msg.chat?.type || null;\nconst firstName = msg.from?.first_name || 'Usuário';\n\nlet code = null;\nconst match = text.match(/\\/start\\s+([A-Z0-9\\-]+)/i);\nif (match && match[1]) {\n  code = match[1].trim().toUpperCase();\n}\n\nreturn [{\n  json: {\n    code,\n    chat_id: chatId,\n    user_id: userId,\n    chat_type: chatType,\n    first_name: firstName,\n    raw_text: text\n  }\n}];"
       },
       "id": "a48bbb2e-ce71-4e01-85a1-a5b1e76b39c6",
       "name": "Extrair Código /start",
@@ -63,7 +63,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT order_id, name, email FROM core.orders WHERE invite_code = '{{ $json.code }}' AND code_used_at IS NULL LIMIT 1;",
+        "query": "={{ `SELECT order_id, name, email FROM core.orders WHERE invite_code = '${$json.code}' AND code_used_at IS NULL LIMIT 1;` }}",
         "options": {}
       },
       "id": "129b6c58-5e88-489c-bdff-44e4fd45961d",
@@ -184,7 +184,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE invite_code = '{{ $('Extrair Código /start').item.json.code }}';",
+        "query": "={{ `UPDATE core.orders SET code_used_at = NOW(), payment_status = 'aprovado_no_telegram' WHERE invite_code = '${$('Extrair Código /start').item.json.code}';` }}",
         "options": {}
       },
       "id": "92b70f4c-a776-4762-8bd3-be32c8830e27",
