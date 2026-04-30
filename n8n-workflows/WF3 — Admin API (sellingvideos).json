@@ -266,13 +266,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.telegram.org/bot8621371115:AAH26uR8zSLzaaYFpofhc5NuJ23Yg4Ss83E/createChatInviteLink",
+        "url": "={{ 'https://api.telegram.org/bot' + $env.TELEGRAM_BOT_TOKEN + '/createChatInviteLink' }}",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
             {
               "name": "chat_id",
-              "value": "-1003846840774"
+              "value": "={{ $env.TELEGRAM_CHANNEL_ID }}"
             },
             {
               "name": "member_limit",
