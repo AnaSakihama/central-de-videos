@@ -1,0 +1,51 @@
+# Gemini Ignore - Otimização de Tokens
+
+# Diretórios de Controle de Versão
+.git/
+.svn/
+.hg/
+
+# Dependências (se houver)
+node_modules/
+bower_components/
+
+# Builds e Distribuição
+dist/
+build/
+out/
+.next/
+
+# Arquivos Binários e Pesados
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+*.zip
+*.rar
+*.mp4
+*.webm
+favicon.png
+
+# Configurações de Ambiente (Segurança e Contexto)
+.env
+.env.*
+!.env.example
+
+# Logs e Cache
+*.log
+.cache/
+.npm/
+.eslintcache
+
+# Arquivos de Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos Temporários de IDE
+.vscode/
+.idea/
+*.swp
+*.bak

@@ -305,7 +305,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ `SELECT log_email FROM core.orders WHERE order_id = '${$json.order_id}' LIMIT 1;` }}",
+        "query": "={{ `SELECT log_email FROM core.orders WHERE order_id = '${$node[\"Montar Objeto do Pedido\"].json.order_id}' LIMIT 1;` }}",
         "options": {}
       },
       "id": "9233fba0-c73b-49c0-96b1-11590156bfe5",
