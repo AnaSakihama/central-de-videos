@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://via.placeholder.com; connect-src 'self' https://n8n.saleschannel.com.br; media-src 'self'; frame-ancestors 'none';">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://via.placeholder.com; media-src 'self'; frame-ancestors 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Channel | A Munição dos Afiliados que Faturam Alto</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <meta name="description"
-        content="Receba diariamente vídeos virais, sem marca d'água e de alta conversão no seu Telegram. Baixe, poste e veja as comissões caírem. Acesso vitalício por R$9,90.">
+        content="Receba diariamente vídeos virais, sem marca d'água e de alta conversão no seu Telegram. Baixe, poste e veja as comissões caírem. Acesso vitalício por apenas R$ 9,90.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -148,6 +148,16 @@
                 Receba no Telegram os vídeos dos produtos mais viralizados, prontos, em HD e sem marca d'água.
                 <strong>Seu trabalho é gerir o lucro, não editar vídeos.</strong>
             </p>
+            <div class="hero-cta-container">
+                <a href="https://mpago.la/16xZ8wi" id="btn-hero" class="cta-button primary">
+                    ⚡ Garantir Meu Acesso Vitalício — R$ 9,90
+                </a>
+                <div class="guarantee-strip" style="margin-top: 1rem;">
+                    <span>🔒 Pagamento seguro</span>
+                    <span>♾️ Acesso vitalício</span>
+                    <span>✅ Sem mensalidades</span>
+                </div>
+            </div>
         </div>
         <section class="section" style="background: #f4f4f9;">
             <div class="container">
@@ -297,7 +307,7 @@
                 <div class="how-step">
                     <div class="step-num">1️⃣</div>
                     <h4>Compre agora</h4>
-                    <p>Clique no botão e conclua o pagamento de R$9,90 via Mercado Pago (cartão, Pix ou boleto).</p>
+                    <p>Clique no botão e conclua o pagamento de R$ 9,90 via Mercado Pago (cartão, Pix ou boleto).</p>
                 </div>
                 <div class="how-step">
                     <div class="step-num">2️⃣</div>
@@ -332,7 +342,7 @@
 
             <div class="faq-item">
                 <h4>2. Preciso pagar todo mês?</h4>
-                <p>Não! Esta é uma oferta especial de acesso vitalício. Você paga R$ 9,90 uma única vez e nunca mais.
+                <p>Não! Esta é uma oferta especial de acesso vitalício. Você paga apenas R$ 9,90 uma única vez e nunca mais.
                 </p>
             </div>
 
@@ -362,14 +372,10 @@
             <h2>👇 Dê o próximo passo para escalar suas vendas</h2>
             <p>Com mais praticidade, mais conteúdo e mais tempo livre.<br>Clique abaixo e garanta o seu acesso agora
                 mesmo.</p>
-            <div class="checkout-container" style="max-width: 400px; margin: 0 auto;">
-                <input type="email" id="email-final" placeholder="Seu melhor e-mail..." class="email-input"
-                    style="border-color: rgba(255,255,255,0.4);">
-                <button id="btn-cta-final" class="cta-button primary"
-                    style="width: 100%; font-size:1.15rem; padding: 18px 40px; cursor: pointer;">
-                    ⚡ Garantir Meu Acesso Vitalício — R$ 9,90
-                </button>
-            </div>
+            <a href="https://mpago.la/16xZ8wi" id="btn-cta-final" class="cta-button primary"
+                style="width: 100%; max-width: 400px; margin: 0 auto; display: block; font-size:1.15rem; padding: 18px 40px; text-decoration: none;">
+                ⚡ Garantir Meu Acesso Vitalício — R$ 9,90
+            </a>
             <div class="guarantee-strip">
                 <span>🔒 Pagamento seguro</span>
                 <span>♾️ Acesso vitalício</span>
@@ -392,119 +398,7 @@
         </div>
     </footer>
 
-    <!-- ── SCRIPTS ────────────────────────────────────────────── -->
-    <script>
-        const API_CHECKOUT = 'https://n8n.saleschannel.com.br/webhook/checkout';
 
-        async function handlePurchaseClick(e) {
-            const btn = e.currentTarget;
-            const inputId = btn.id === 'btn-hero' ? 'email-hero' : 'email-final';
-            const emailInput = document.getElementById(inputId);
-            const email = emailInput.value.trim();
-
-            // Validação simples de e-mail
-            if (!email || !email.includes('@')) {
-                alert('Por favor, insira um e-mail válido para receber o seu acesso.');
-                emailInput.focus();
-                return;
-            }
-
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.style.opacity = '0.8';
-            btn.innerHTML = '<span class="spinner"></span> Criando Checkout Seguro...';
-
-            try {
-                // Usando GET para evitar problemas de CORS pre-flight
-                const response = await fetch(`${API_CHECKOUT}?email=${encodeURIComponent(email)}`, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                if (!response.ok) throw new Error('Falha ao gerar link de pagamento');
-
-                const data = await response.json();
-                console.log('Resposta do Checkout:', data);
-
-                // O n8n pode retornar um array [ { ... } ] ou um objeto direto { ... }
-                const result = Array.isArray(data) ? data[0] : data;
-
-                // Verificação de compra já existente
-                if (result.status === 'already_purchased') {
-                    alert(result.message || 'Identificamos que este e-mail já possui uma compra com pagamento confirmado.');
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                    btn.innerHTML = originalText;
-                    return;
-                }
-
-                // Procura pela URL em diferentes campos possíveis
-                const checkoutUrl = result.url || result.init_point || result.sandbox_init_point;
-
-                if (checkoutUrl) {
-                    window.location.href = checkoutUrl;
-                } else {
-                    console.error('URL não encontrada no objeto:', result);
-                    throw new Error('Link de checkout não encontrado na resposta');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Erro ao iniciar checkout. Tente novamente em alguns instantes.');
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.innerHTML = originalText;
-            }
-        }
-
-        const btnHero = document.getElementById('btn-hero');
-        if (btnHero) btnHero.addEventListener('click', handlePurchaseClick);
-        document.getElementById('btn-cta-final').addEventListener('click', handlePurchaseClick);
-    </script>
-
-    <style>
-        .email-input {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 2px solid rgba(255, 159, 67, 0.4);
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-            outline: none;
-            transition: all 0.3s;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        .email-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .email-input:focus {
-            border-color: #ff9f43;
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 15px rgba(255, 159, 67, 0.2);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
 
 </body>
 

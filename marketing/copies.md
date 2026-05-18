@@ -12,7 +12,7 @@ Eu criei um canal no Telegram que entrega **1+ vídeo pronto todo dia** pra voc�
 
 Sem editar. Sem criar do zero. Só postar.
 
-💰 **R$12,90 — pagamento único, acesso vitalício.**
+💰 **R$9,90 — pagamento único, acesso vitalício.**
 
 ⏱ Aprovação em até 8h. Link vai direto pro seu e-mail.
 
@@ -34,7 +34,7 @@ Nosso canal no Telegram libera **vídeos diários prontos** com gancho, produto 
 ✅ Funciona no TikTok, Reels e Stories
 ✅ Foco em produtos com alta conversão na Shopee
 
-Por apenas **R$12,90 único**, você tem acesso pra sempre.
+Por apenas **R$9,90 único**, você tem acesso pra sempre.
 
 🔗 Link na bio | Aprovação em até 8h
 
@@ -43,7 +43,7 @@ Por apenas **R$12,90 único**, você tem acesso pra sempre.
 ## Variação C — Curiosidade + CTA Simples
 
 **Headline:**
-R$12,90 pra nunca mais ficar sem conteúdo pra postar na Shopee.
+R$9,90 pra nunca mais ficar sem conteúdo pra postar na Shopee.
 
 **Body:**
 Canal privado no Telegram.
@@ -66,7 +66,7 @@ Clica no link aqui embaixo 👇
 
 **Tela 1:** "Afiliado Shopee sem conteúdo pra postar?"
 **Tela 2:** "Vídeos prontos TODO DIA no Telegram 📹"
-**Tela 3:** "R$12,90 • Pagamento único • Acesso vitalício"
+**Tela 3:** "R$9,90 • Pagamento único • Acesso vitalício"
 **Tela 4:** "👆 Link na bio | Link aqui ➡" + sticker de link
 
 ---
@@ -90,7 +90,7 @@ Clica no link aqui embaixo 👇
 [mostrar print do canal com vídeos]
 
 **Oferta (12–17s):**
-"R$12,90 — pagamento único. Acesso vitalício."
+"R$9,90 — pagamento único. Acesso vitalício."
 
 **CTA (17–20s):**
 "Link na bio. Aprovação em até 8 horas."
