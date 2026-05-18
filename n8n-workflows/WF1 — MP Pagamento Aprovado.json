@@ -308,27 +308,6 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ `SELECT COALESCE((SELECT invite_code FROM core.orders WHERE email = '${($node[\"Montar Objeto do Pedido\"].json.email || '').replace(/\\\\/g,'\\\\\\\\').replace(/'/g,\"''\")}' AND payment_status ILIKE 'aprovado%' AND invite_code IS NOT NULL AND invite_code != '' AND order_id != '${$node[\"Montar Objeto do Pedido\"].json.order_id}' LIMIT 1), '') AS existing_invite_code;` }}",
-        "options": {}
-      },
-      "id": "e1f2a3b4-5678-9abc-def0-aabbccddeeff",
-      "name": "Buscar Invite Existente",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2,
-      "position": [
-        -4928,
-        -3952
-      ],
-      "credentials": {
-        "postgres": {
-          "id": "JAKg7UeoJtM66d5M",
-          "name": "PostgresSellingVideos"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
         "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) VALUES ('${$node[\"Montar Objeto do Pedido\"].json.order_id}', '${$node[\"Montar Objeto do Pedido\"].json.payment_status}', 'WEBHOOK_RECEBIDO');` }}",
         "options": {}
       },
@@ -509,7 +488,7 @@
         "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
         "subject": "=✅ Seu Acesso VIP Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
         "emailFormat": "html",
-        "html": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">  <h2>Seu pagamento foi confirmado!</h2>  <p>Olá <b>{{ $node['Montar Objeto do Pedido'].json.name }}</b>,</p>  <p>O seu pedido <b>#{{ $node['Montar Objeto do Pedido'].json.order_id }}</b> foi aprovado e o seu acesso vitalício está liberado.</p>  <p>Para entrar no canal VIP e ativar seu acesso aos vídeos, clique no botão abaixo:</p>  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\">      <a href=\"https://t.me/divulgaVovo_bot?start={{ $node['Buscar Invite Existente'].json.existing_invite_code || $node['Montar Objeto do Pedido'].json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">Ativar Acesso Agora</a>    </td></tr>  </table>  <p>Seu código exclusivo de ativação é: <b>{{ $node['Buscar Invite Existente'].json.existing_invite_code || $node['Montar Objeto do Pedido'].json.invite_code }}</b></p>  <p>Você será direcionado ao nosso robô do Telegram que irá validar seu pedido e te entregará o link único do canal.</p>  <p>Qualquer problema entre em contato respondendo este e-mail.</p>  <p>Sales Channel agradece sua compra!</p></div>",
+        "html": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f4f8;padding:20px\">  <h2>Seu pagamento foi confirmado!</h2>  <p>Olá <b>{{ $node['Montar Objeto do Pedido'].json.name }}</b>,</p>  <p>O seu pedido <b>#{{ $node['Montar Objeto do Pedido'].json.order_id }}</b> foi aprovado e o seu acesso vitalício está liberado.</p>  <p>Para entrar no canal VIP e ativar seu acesso aos vídeos, clique no botão abaixo:</p>  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:20px auto\">    <tr><td align=\"center\" bgcolor=\"#6c63ff\" style=\"border-radius:10px\">      <a href=\"https://t.me/divulgaVovo_bot?start={{ $node['Montar Objeto do Pedido'].json.invite_code }}\" style=\"padding:15px 30px;color:#fff;text-decoration:none;display:inline-block;font-weight:bold\">Ativar Acesso Agora</a>    </td></tr>  </table>  <p>Seu código exclusivo de ativação é: <b>{{ $node['Montar Objeto do Pedido'].json.invite_code }}</b></p>  <p>Você será direcionado ao nosso robô do Telegram que irá validar seu pedido e te entregará o link único do canal.</p>  <p>Qualquer problema entre em contato respondendo este e-mail.</p>  <p>Sales Channel agradece sua compra!</p></div>",
         "options": {}
       },
       "id": "376066b2-7987-4d91-8423-7a841ad252b2",
@@ -531,7 +510,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) SELECT '${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_PEDIDO_ENVIADO' WHERE NOT EXISTS (SELECT 1 FROM core.webhook_logs WHERE order_id = '${$node[\"Montar Objeto do Pedido\"].json.order_id}' AND action_taken = 'EMAIL_PEDIDO_ENVIADO') RETURNING *;` }}",
+        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) SELECT '${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_PEDIDO_ENVIADO' WHERE NOT EXISTS (SELECT 1 FROM core.webhook_logs WHERE order_id = '${$node[\"Montar Objeto do Pedido\"].json.order_id}' AND action_taken = 'EMAIL_PEDIDO_ENVIADO');` }}",
         "options": {}
       },
       "id": "c8b19e49-5665-41b8-970d-6d940cc4cf31",
@@ -551,37 +530,6 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "was-locked-pendente",
-              "leftValue": "={{ $json.order_id || '' }}",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "b1e2f3a4-5678-9abc-def0-123456789abc",
-      "name": "Bloqueou Pendente?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        -3968,
-        -3712
-      ]
-    },
-    {
-      "parameters": {
         "fromEmail": "saleschannel.admin@gmail.com",
         "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
         "subject": "=🛒 Pedido Recebido — Sales Channel [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
@@ -594,7 +542,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        -3728,
+        -3968,
         -3712
       ],
       "webhookId": "e51c3383-e704-450e-a504-b1529615125c",
@@ -783,17 +731,6 @@
       "main": [
         [
           {
-            "node": "Buscar Invite Existente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Buscar Invite Existente": {
-      "main": [
-        [
-          {
             "node": "Log Webhook Recebido",
             "type": "main",
             "index": 0
@@ -884,17 +821,6 @@
       ]
     },
     "Trava Pendente": {
-      "main": [
-        [
-          {
-            "node": "Bloqueou Pendente?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Bloqueou Pendente?": {
       "main": [
         [
           {
