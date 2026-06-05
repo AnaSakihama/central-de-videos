@@ -1,4 +1,4 @@
-# 📋 Playbook de Operação — SellingVideos
+# 📋 Playbook de Operação — Estúdio de Mídias
 
 > **Foco:** Monitoramento da automação e suporte ao cliente.
 > A aprovação agora é 100% automatizada via Telegram Bot.
@@ -21,7 +21,7 @@ O sistema foi desenhado para rodar sem intervenção humana:
 Acesse o **Painel Admin** (`/sellingvideos/admin-panel`) 1x ao dia para:
 - [ ] Verificar se todos os pagamentos `aprovados` possuem um `invite_code` gerado.
 - [ ] Checar no banco se os usuários estão conseguindo usar o código (`order_status` vira `aprovado_no_telegram`).
-- [ ] Responder e-mails de suporte que chegam no `admin@saleschannel.com.br`.
+- [ ] Responder e-mails de suporte que chegam no `admin@estudiodemidias.com.br`.
 
 ---
 

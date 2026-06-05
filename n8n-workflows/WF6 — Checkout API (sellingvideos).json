@@ -47,7 +47,7 @@
       "credentials": {
         "postgres": {
           "id": "JAKg7UeoJtM66d5M",
-          "name": "PostgresSellingVideos"
+          "name": "PostgresEstudiodemidias"
         }
       }
     },
@@ -96,7 +96,7 @@
               },
               {
                 "name": "Access-Control-Allow-Origin",
-                "value": "https://saleschannel.com.br"
+                "value": "https://estudiodemidias.com.br"
               }
             ]
           }
@@ -123,7 +123,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício Sales Channel VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node['Validar E-mail'].json.email }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\",\n    \"failure\": \"https://saleschannel.com.br/sellingvideos/index.html\",\n    \"pending\": \"https://saleschannel.com.br/sellingvideos/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"SELLINGVIDEOS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node['Validar E-mail'].json.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
+        "jsonBody": "={\n  \"items\": [\n    {\n      \"title\": \"Acesso Vitalício Estúdio de Mídias VIP\",\n      \"unit_price\": 12.90,\n      \"quantity\": 1,\n      \"currency_id\": \"BRL\"\n    }\n  ],\n  \"payer\": {\n    \"email\": \"{{ $node['Validar E-mail'].json.email }}\"\n  },\n  \"back_urls\": {\n    \"success\": \"https://estudiodemidias.com.br/obrigado.html\",\n    \"failure\": \"https://estudiodemidias.com.br/index.html\",\n    \"pending\": \"https://estudiodemidias.com.br/obrigado.html\"\n  },\n  \"auto_return\": \"approved\",\n  \"notification_url\": \"https://n8n.saleschannel.com.br/webhook/mp-payment\",\n  \"statement_descriptor\": \"ESTUDIODEMIDIAS\",\n  \"external_reference\": \"CHECKOUT_DYNAMIC\",\n  \"metadata\": {\n    \"email\": \"{{ $node['Validar E-mail'].json.email }}\"\n  },\n  \"payment_methods\": {\n    \"excluded_payment_types\": [\n      { \"id\": \"ticket\" },\n      { \"id\": \"atm\" }\n    ],\n    \"installments\": 12\n  }\n}",
         "options": {}
       },
       "id": "7910f077-8b48-42bb-858e-339e24570faf",
@@ -155,7 +155,7 @@
               },
               {
                 "name": "Access-Control-Allow-Origin",
-                "value": "https://saleschannel.com.br"
+                "value": "https://estudiodemidias.com.br"
               }
             ]
           }

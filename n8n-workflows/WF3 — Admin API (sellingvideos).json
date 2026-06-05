@@ -135,7 +135,7 @@
       "credentials": {
         "postgres": {
           "id": "JAKg7UeoJtM66d5M",
-          "name": "PostgresSellingVideos"
+          "name": "PostgresEstudiodemidias"
         }
       }
     },
@@ -197,7 +197,7 @@
       "credentials": {
         "postgres": {
           "id": "JAKg7UeoJtM66d5M",
-          "name": "PostgresSellingVideos"
+          "name": "PostgresEstudiodemidias"
         }
       }
     },
@@ -259,7 +259,7 @@
       "credentials": {
         "postgres": {
           "id": "JAKg7UeoJtM66d5M",
-          "name": "PostgresSellingVideos"
+          "name": "PostgresEstudiodemidias"
         }
       }
     },

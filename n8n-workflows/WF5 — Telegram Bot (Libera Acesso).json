@@ -77,7 +77,7 @@
       "credentials": {
         "postgres": {
           "id": "JAKg7UeoJtM66d5M",
-          "name": "PostgresSellingVideos"
+          "name": "PostgresEstudiodemidias"
         }
       }
     },
@@ -198,7 +198,7 @@
       "credentials": {
         "postgres": {
           "id": "JAKg7UeoJtM66d5M",
-          "name": "PostgresSellingVideos"
+          "name": "PostgresEstudiodemidias"
         }
       }
     },
@@ -247,7 +247,7 @@
             },
             {
               "name": "text",
-              "value": "👋 Olá! Para liberar seu acesso VIP, abra o link enviado no seu e-mail.\\n\\nSe o bot abriu sem o código, volte ao e-mail e clique novamente no botão/link correto.\\n\\nSe você ainda não adquiriu, acesse: https://saleschannel.com.br/sellingvideos"
+              "value": "👋 Olá! Para liberar seu acesso VIP, abra o link enviado no seu e-mail.\\n\\nSe o bot abriu sem o código, volte ao e-mail e clique novamente no botão/link correto.\\n\\nSe você ainda não adquiriu, acesse: https://estudiodemidias.com.br"
             },
             {
               "name": "parse_mode",

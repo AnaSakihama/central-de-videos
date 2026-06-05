@@ -1,4 +1,4 @@
-# Configuração Técnica — SellingVideos
+# Configuração Técnica — Estúdio de Mídias
 
 > **Última Atualização:** Abril 2026 — VPS `187.127.3.62`.
 > Automação completa via Bot Telegram e Banco PostgreSQL (Colunas em Inglês).
@@ -35,9 +35,9 @@ docker exec -i saleschannel_postgres psql -U sellingvideos_user -d sellingvideos
 
 | Credencial | Tipo | Configuração |
 |---|---|---|
-| **PostgresSellingVideos** | `PostgreSQL` | Host: `saleschannel_postgres`, User: `sellingvideos_user`, DB: `sellingvideos_db` |
+| **PostgresEstudiodemidias** | `PostgreSQL` | Host: `saleschannel_postgres`, User: `sellingvideos_user`, DB: `sellingvideos_db` |
 | **Mercado Pago - Access Token**| `Header Auth` | Name: `Authorization`, Value: `Bearer APP_USR-...` |
-| **Gmail SMTP - SalesChannel** | `SMTP` | Host: `smtp.gmail.com`, Port: `465` (SSL), User: `seu-gmail`, Password: `Senha de App` |
+| **Gmail SMTP - Estúdio de Mídias** | `SMTP` | Host: `smtp.gmail.com`, Port: `465` (SSL), User: `estudiodemidias.admin@gmail.com`, Password: `Senha de App` |
 
 ---
 
@@ -47,7 +47,7 @@ Importe os arquivos da pasta `n8n-workflows/` na seguinte ordem:
 
 1. **WF1 — MP Pagamento Aprovado**: Gerencia IPN, cria código `invite_code` e envia e-mails.
 2. **WF3 — Admin API**: Alimenta o painel admin. Defina sua `Admin Key` no nó de `If`.
-3. **WF4 — Suporte**: Recebe dados de `suporte.html` e envia para `admin@saleschannel.com.br`.
+3. **WF4 — Suporte**: Recebe dados de `suporte.html` e envia para `admin@estudiodemidias.com.br`.
 4. **WF5 — Telegram Bot**: Valida códigos e gera links únicos.
 
 ---
@@ -96,7 +96,7 @@ Mesmo com o checkout automático, você ainda precisa configurar a IPN para que 
 
 ## 8. Estrutura de URLs (Produção)
 
-- **Landing Page:** `https://saleschannel.com.br/sellingvideos`
+- **Landing Page:** `https://estudiodemidias.com.br`
 - **Checkout API:** `https://n8n.saleschannel.com.br/webhook/checkout`
 - **Webhook IPN:** `https://n8n.saleschannel.com.br/webhook/mp-payment`
-- **Obrigado:** `https://saleschannel.com.br/sellingvideos/obrigado.html`
+- **Obrigado:** `https://estudiodemidias.com.br/obrigado.html`

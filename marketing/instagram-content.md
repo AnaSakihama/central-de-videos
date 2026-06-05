@@ -36,7 +36,7 @@ Aqui estão 3 opções de roteiros focados em despertar o desejo e levar para a 
 - **Chamada de Ação (CTA):** "Eu criei um canal secreto onde entrego isso todo dia. Quer o acesso? **Comenta EU QUERO** que eu te mando a página com todos os detalhes no direct."
 
 ### Roteiro 2 — A Prova Social ("Bastidores")
-**[Vídeo de Fundo]**: Gravando a tela do celular abrindo o Telegram, mostrando o canal "SalesChannel" cheio de vídeos sendo postados.
+**[Vídeo de Fundo]**: Gravando a tela do celular abrindo o Telegram, mostrando o canal "Estúdio de Mídias" cheio de vídeos sendo postados.
 - **Texto na tela:** Como eu acho os melhores vídeos da Shopee
 - **Áudio:** "Olha isso. Eu não perco mais um minuto pesquisando vídeo pra postar." (Mostra dando play em 2 vídeos legais).
 - **Áudio:** "Todo dia cai aqui nessa pasta secreta vídeos limpinhos, sem marca d'água chinesa e dos produtos que mais dão comissão."
@@ -62,7 +62,7 @@ O jogo do afiliado mudou. Quem ganha não é quem faz o roteiro perfeito, é que
 
 Mas eu sei, achar vídeo sem aquela marca d'água feia, que não pareça spam e com boa qualidade dá um trabalho absurdo.
 
-Foi por isso que eu criei o **SalesChannel**. Um canal VIP onde eu faço a curadoria, limpo os vídeos e te entrego tudo de bandeja todo santo dia. 📲
+Foi por isso que eu criei o **Estúdio de Mídias**. Um canal VIP onde eu faço a curadoria, limpo os vídeos e te entrego tudo de bandeja todo santo dia. 📲
 
 ✅ Vídeos em alta qualidade
 ✅ Zero marca d'água

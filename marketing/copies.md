@@ -1,4 +1,4 @@
-# Copies de Marketing — SalesChannel Afiliados Shopee
+# Copies de Marketing — Estúdio de Mídias — Afiliados Shopee
 
 ## Variação A — Direto + Urgência
 

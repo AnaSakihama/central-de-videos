@@ -1,4 +1,4 @@
-# SellingVideos — Vídeos Prontos para Afiliados
+# Estúdio de Mídias — Vídeos Prontos para Afiliados
 
 > Canal privado no Telegram com vídeos prontos diários para afiliados (Shopee, Amazon, AliExpress, etc) | R$12,90 acesso vitalício. Entrega 100% automatizada via Telegram Bot.
 
@@ -8,7 +8,7 @@
 
 ```
 sellingvideos/
-├── admin-panel/        # Painel admin (abrir https://saleschannel.com.br/sellingvideos)
+├── admin-panel/        # Painel admin (abrir https://estudiodemidias.com.br)
 ├── landing-page/       # Ativos de design e CSS da página de vendas
 ├── index.html          # Landing Page principal (Página de Vendas)
 ├── suporte.html        # Central de Suporte (Formulário Integrado)
@@ -67,7 +67,7 @@ O projeto usa o schema **`core`** no banco `sellingvideos_db`.
 
 ### E-mail de Acesso Liberado
 ```
-Assunto: ✅ Acesso Liberado — Vídeos SellingVideos VIP
+Assunto: ✅ Acesso Liberado — Vídeos Estúdio de Mídias VIP
 
 Olá [NAME]!
 Seu pagamento foi confirmado. Para entrar no canal VIP:
@@ -81,8 +81,8 @@ Seu pagamento foi confirmado. Para entrar no canal VIP:
 ## 📞 Suporte e Contato
 
 - **Formulário:** Disponível em `/suporte.html`.
-- **E-mail:** `admin@saleschannel.com.br` (recebe todas as solicitações do formulário via WF4).
+- **E-mail:** `admin@estudiodemidias.com.br` (recebe todas as solicitações do formulário via WF4).
 
 ---
 
-*SellingVideos — Automação de Vendas Digitais | Abril 2026*
+*Estúdio de Mídias — Automação de Vendas Digitais | Abril 2026*
