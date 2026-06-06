@@ -1,11 +1,18 @@
 // ─────────────────────────────────────────────
-//  SalesChannel Admin Panel — app.js
+//  Estúdio de Mídias Admin Panel — app.js
 //  Conecta com a API n8n (WF3 - Admin API)
 // ─────────────────────────────────────────────
 
 const API_BASE = 'https://n8n.saleschannel.com.br/webhook/admin'; // Endpoint único do WF3
 let adminKey = sessionStorage.getItem('sc_admin_key') || '';
 let allOrders = [];
+
+// -- XSS Protection --
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
 
 // ── Init ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -183,11 +190,11 @@ function buildTable(orders) {
   }
 
   const rows = orders.map(o => `
-    <tr onclick="openOrderModal('${o.order_id}')">
-      <td>${o.order_id || '—'}</td>
-      <td>${o.name || '—'}</td>
-      <td>${o.email || '—'}</td>
-      <td>${o.telegram_username ? '@' + o.telegram_username.replace('@', '') : '—'}</td>
+    <tr onclick="openOrderModal('${escapeHtml(o.order_id)}')"> 
+      <td>${escapeHtml(o.order_id)}</td>
+      <td>${escapeHtml(o.name)}</td>
+      <td>${escapeHtml(o.email)}</td>
+      <td>${o.telegram_username ? '@' + escapeHtml(o.telegram_username.replace('@', '')) : '—'}</td>
       <td>${paymentBadge(o.payment_status)}</td>
       <td>${orderBadge(o.order_status)}</td>
       <td>${formatDate(o.created_at)}</td>
@@ -223,10 +230,10 @@ function openOrderModal(orderId) {
     <div class="modal-title">📋 Pedido #${order.order_id}</div>
     ${eligibilityBlock}
     <div style="margin-top:16px">
-      ${detailRow('Nome', order.name || '—')}
-      ${detailRow('E-mail', order.email || '—')}
-      ${detailRow('Telegram', order.telegram_username ? '@' + order.telegram_username : '—')}
-      ${detailRow('Valor', 'R$' + (order.price || '12,90'))}
+      ${detailRow('Nome', escapeHtml(order.name))}
+      ${detailRow('E-mail', escapeHtml(order.email))}
+      ${detailRow('Telegram', order.telegram_username ? '@' + escapeHtml(order.telegram_username) : '—')}
+      ${detailRow('Valor', 'R$ 9,90')}
       ${detailRow('Status Pagamento', paymentBadge(order.payment_status))}
       ${detailRow('Status Pedido', orderBadge(order.order_status))}
       ${detailRow('Criado em', formatDate(order.created_at))}

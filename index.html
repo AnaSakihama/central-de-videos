@@ -408,6 +408,8 @@
     <!-- ── SCRIPTS ────────────────────────────────────────────── -->
     <script>
         const API_CHECKOUT = 'https://n8n.saleschannel.com.br/webhook/checkout';
+        let lastCheckoutTime = 0;
+        const CHECKOUT_COOLDOWN_MS = 5000; // 5 segundos entre tentativas
 
         async function handlePurchaseClick(e) {
             const btn = e.currentTarget;
@@ -421,6 +423,14 @@
                 emailInput.focus();
                 return;
             }
+
+            // Rate limiting — impede múltiplos cliques em sequência
+            const now = Date.now();
+            if (now - lastCheckoutTime < CHECKOUT_COOLDOWN_MS) {
+                alert('Aguarde alguns segundos antes de tentar novamente.');
+                return;
+            }
+            lastCheckoutTime = now;
 
             const originalText = btn.innerHTML;
             btn.disabled = true;
