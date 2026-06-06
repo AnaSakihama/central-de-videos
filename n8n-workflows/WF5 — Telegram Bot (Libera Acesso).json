@@ -247,7 +247,7 @@
             },
             {
               "name": "text",
-              "value": "👋 Olá! Para liberar seu acesso VIP, abra o link enviado no seu e-mail.\\n\\nSe o bot abriu sem o código, volte ao e-mail e clique novamente no botão/link correto.\\n\\nSe você ainda não adquiriu, acesse: https://www.estudiodemidias.com.br/canal-de-videos"
+              "value": "👋 Olá! Para liberar seu acesso VIP, abra o link enviado no seu e-mail.\\n\\nSe o bot abriu sem o código, volte ao e-mail e clique novamente no botão/link correto.\\n\\nSe você ainda não adquiriu, acesse: https://www.estudiodemidias.com.br/central-de-videos"
             },
             {
               "name": "parse_mode",
