@@ -1,6 +1,6 @@
 # Estúdio de Mídias — Vídeos Prontos para Afiliados
 
-> Canal privado no Telegram com vídeos prontos diários para afiliados (Shopee, Amazon, AliExpress, etc) | R$12,90 acesso vitalício. Entrega 100% automatizada via Telegram Bot.
+> Canal privado no Telegram com vídeos prontos diários para afiliados (Shopee, Amazon, AliExpress, etc) | R$9,90 acesso vitalício. Entrega 100% automatizada via Telegram Bot.
 
 ---
 
@@ -42,7 +42,7 @@ O projeto usa o schema **`core`** no banco `sellingvideos_db`.
 | `order_id` | TEXT (PK) | ID do pagamento no Mercado Pago |
 | `name` | TEXT | Nome do comprador |
 | `email` | TEXT | E-mail da compra |
-| `price` | NUMERIC | Valor pago (R$ 12,90) |
+| `price` | NUMERIC | Valor pago (R$ 9,90) |
 | `payment_status`| TEXT | `aprovado`, `pendente`, `recusado`, `estornado` |
 | `order_status` | TEXT | `novo`, `aguardando_pagamento`, `link_enviado`, `rejeitado` |
 | `invite_code` | TEXT | Código único gerado para o Bot |
@@ -52,7 +52,7 @@ O projeto usa o schema **`core`** no banco `sellingvideos_db`.
 
 ## 🤖 Fluxo de Automação
 
-1. **Compra:** O cliente paga R$ 12,90 na Landing Page via Mercado Pago.
+1. **Compra:** O cliente paga R$ 9,90 na Landing Page via Mercado Pago.
 2. **IPN (WF1):** O Mercado Pago avisa o n8n.
    - Se **Pendente**: Envia e-mail de "Pedido Recebido".
    - Se **Aprovado**: Gera um código único (`SV-XXXXXX`), grava no banco e envia e-mail de "Acesso Liberado" com o link do Bot.
