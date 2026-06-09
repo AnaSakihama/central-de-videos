@@ -510,7 +510,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) SELECT '${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_PEDIDO_ENVIADO' WHERE NOT EXISTS (SELECT 1 FROM core.webhook_logs WHERE order_id = '${$node[\"Montar Objeto do Pedido\"].json.order_id}' AND action_taken = 'EMAIL_PEDIDO_ENVIADO');` }}",
+        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) SELECT '${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_PEDIDO_ENVIADO' WHERE NOT EXISTS (SELECT 1 FROM core.webhook_logs WHERE order_id = '${$node[\"Montar Objeto do Pedido\"].json.order_id}' AND action_taken = 'EMAIL_PEDIDO_ENVIADO') RETURNING *;` }}",
         "options": {}
       },
       "id": "c8b19e49-5665-41b8-970d-6d940cc4cf31",
@@ -530,6 +530,37 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "was-locked-pendente",
+              "leftValue": "={{ $json.order_id || '' }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d1e2f3a4-b5c6-47d8-e9f0-1a2b3c4d5e6f",
+      "name": "Bloqueou Pendente?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -3968,
+        -3712
+      ]
+    },
+    {
+      "parameters": {
         "fromEmail": "contato@estudiodemidias.com.br",
         "toEmail": "={{ $node['Montar Objeto do Pedido'].json.email }}",
         "subject": "=🛒 Pedido Recebido — Estúdio de Mídias [Pedido #{{ $node['Montar Objeto do Pedido'].json.order_id }}]",
@@ -542,7 +573,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        -3968,
+        -3728,
         -3712
       ],
       "webhookId": "e51c3383-e704-450e-a504-b1529615125c",
@@ -821,6 +852,17 @@
       ]
     },
     "Trava Pendente": {
+      "main": [
+        [
+          {
+            "node": "Bloqueou Pendente?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bloqueou Pendente?": {
       "main": [
         [
           {
