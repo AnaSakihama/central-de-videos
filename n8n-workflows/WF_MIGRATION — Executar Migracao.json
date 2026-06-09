@@ -40,6 +40,8 @@
     },
     {
       "parameters": {
+        "respondWith": "text",
+        "responseBody": "={\n  \"status\": \"sucesso\",\n  \"message\": \"Migração de banco executada e trava de segurança ativada!\"\n}",
         "options": {
           "responseCode": 200,
           "responseHeaders": {
