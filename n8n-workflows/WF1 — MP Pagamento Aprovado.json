@@ -308,7 +308,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) VALUES ('${$node[\"Montar Objeto do Pedido\"].json.order_id}', '${$node[\"Montar Objeto do Pedido\"].json.payment_status}', 'WEBHOOK_RECEBIDO');` }}",
+        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) VALUES ('${$node[\"Montar Objeto do Pedido\"].json.order_id}', '${$node[\"Montar Objeto do Pedido\"].json.payment_status}', 'WEBHOOK_RECEBIDO') ON CONFLICT (order_id, action_taken) DO NOTHING;` }}",
         "options": {}
       },
       "id": "13fca0de-cbaf-4c4e-b6bc-0af8bed066c8",
