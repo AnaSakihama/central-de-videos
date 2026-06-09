@@ -13,22 +13,64 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        250,
+        100,
         300
       ]
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "CREATE TABLE IF NOT EXISTS core.webhook_logs (\n  order_id     TEXT        NOT NULL,\n  event_type   TEXT,\n  action_taken TEXT        NOT NULL,\n  created_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP\n);\n\nDELETE FROM core.webhook_logs a\nUSING core.webhook_logs b\nWHERE a.ctid < b.ctid\n  AND a.order_id = b.order_id\n  AND a.action_taken = b.action_taken;\n\nDO $$\nBEGIN\n    IF NOT EXISTS (\n        SELECT 1 \n        FROM pg_constraint \n        WHERE conname = 'unique_order_action'\n    ) THEN\n        ALTER TABLE core.webhook_logs \n        ADD CONSTRAINT unique_order_action UNIQUE (order_id, action_taken);\n    END IF;\nEND $$;",
+        "query": "CREATE TABLE IF NOT EXISTS core.webhook_logs (\n  order_id     TEXT        NOT NULL,\n  event_type   TEXT,\n  action_taken TEXT        NOT NULL,\n  created_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP\n);",
         "options": {}
       },
-      "id": "run-migration",
-      "name": "Executar SQL",
+      "id": "run-migration-1",
+      "name": "1. Criar Tabela se não existir",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        480,
+        280,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "JAKg7UeoJtM66d5M",
+          "name": "PostgresEstudiodemidias"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM core.webhook_logs a\nUSING core.webhook_logs b\nWHERE a.ctid < b.ctid\n  AND a.order_id = b.order_id\n  AND a.action_taken = b.action_taken;",
+        "options": {}
+      },
+      "id": "run-migration-2",
+      "name": "2. Limpar registros duplicados",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "JAKg7UeoJtM66d5M",
+          "name": "PostgresEstudiodemidias"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE UNIQUE INDEX IF NOT EXISTS unique_order_action_idx ON core.webhook_logs (order_id, action_taken);",
+        "options": {}
+      },
+      "id": "run-migration-3",
+      "name": "3. Criar Indice de Unicidade",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        640,
         300
       ],
       "credentials": {
@@ -41,7 +83,7 @@
     {
       "parameters": {
         "respondWith": "text",
-        "responseBody": "={\n  \"status\": \"sucesso\",\n  \"message\": \"Migração de banco executada e trava de segurança ativada!\"\n}",
+        "responseBody": "={\n  \"status\": \"sucesso\",\n  \"message\": \"Migração de banco executada e trava de segurança ativada com índice único!\"\n}",
         "options": {
           "responseCode": 200,
           "responseHeaders": {
@@ -59,7 +101,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        720,
+        840,
         300
       ]
     }
@@ -70,14 +112,36 @@
       "main": [
         [
           {
-            "node": "Executar SQL",
+            "node": "1. Criar Tabela se não existir",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Executar SQL": {
+    "1. Criar Tabela se não existir": {
+      "main": [
+        [
+          {
+            "node": "2. Limpar registros duplicados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Limpar registros duplicados": {
+      "main": [
+        [
+          {
+            "node": "3. Criar Indice de Unicidade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Criar Indice de Unicidade": {
       "main": [
         [
           {
