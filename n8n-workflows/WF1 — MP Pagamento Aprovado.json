@@ -433,7 +433,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) SELECT '${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_VIP_ENVIADO' WHERE NOT EXISTS (SELECT 1 FROM core.webhook_logs WHERE order_id = '${$node[\"Montar Objeto do Pedido\"].json.order_id}' AND action_taken = 'EMAIL_VIP_ENVIADO') RETURNING *;` }}",
+        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) VALUES ('${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_VIP_ENVIADO') ON CONFLICT (order_id, action_taken) DO NOTHING RETURNING *;` }}",
         "options": {}
       },
       "id": "9d3a9684-c018-44bb-aad8-4d73d4f6e4ca",
@@ -510,7 +510,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) SELECT '${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_PEDIDO_ENVIADO' WHERE NOT EXISTS (SELECT 1 FROM core.webhook_logs WHERE order_id = '${$node[\"Montar Objeto do Pedido\"].json.order_id}' AND action_taken = 'EMAIL_PEDIDO_ENVIADO') RETURNING *;` }}",
+        "query": "{{ `INSERT INTO core.webhook_logs (order_id, event_type, action_taken) VALUES ('${$node[\"Montar Objeto do Pedido\"].json.order_id}', 'payment', 'EMAIL_PEDIDO_ENVIADO') ON CONFLICT (order_id, action_taken) DO NOTHING RETURNING *;` }}",
         "options": {}
       },
       "id": "c8b19e49-5665-41b8-970d-6d940cc4cf31",

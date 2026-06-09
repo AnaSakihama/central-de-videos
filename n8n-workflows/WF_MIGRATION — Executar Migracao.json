@@ -1,0 +1,100 @@
+{
+  "name": "WF_MIGRATION — Executar Migracao",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "executar-migracao",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS core.webhook_logs (\n  order_id     TEXT        NOT NULL,\n  event_type   TEXT,\n  action_taken TEXT        NOT NULL,\n  created_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP\n);\n\nDELETE FROM core.webhook_logs a\nUSING core.webhook_logs b\nWHERE a.ctid < b.ctid\n  AND a.order_id = b.order_id\n  AND a.action_taken = b.action_taken;\n\nDO $$\nBEGIN\n    IF NOT EXISTS (\n        SELECT 1 \n        FROM pg_constraint \n        WHERE conname = 'unique_order_action'\n    ) THEN\n        ALTER TABLE core.webhook_logs \n        ADD CONSTRAINT unique_order_action UNIQUE (order_id, action_taken);\n    END IF;\nEND $$;",
+        "options": {}
+      },
+      "id": "run-migration",
+      "name": "Executar SQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "JAKg7UeoJtM66d5M",
+          "name": "PostgresEstudiodemidias"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-user",
+      "name": "Responder Cliente",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Executar SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar SQL": {
+      "main": [
+        [
+          {
+            "node": "Responder Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "id": "migration-wf-id",
+  "tags": []
+}
